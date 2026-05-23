@@ -31,6 +31,12 @@ function AdminPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,11 +68,27 @@ function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#0B1120] text-white p-4 md:p-8">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-xl shadow-[0_20px_50px_rgba(22,163,74,0.3)] flex items-center gap-3 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
+          <svg className="w-6 h-6 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+          <span className="font-bold tracking-wide">{toastMessage}</span>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <div className="flex justify-between items-center border-b border-white/10 pb-6">
           <h1 className="text-2xl md:text-4xl font-black italic">KRISHNA SCALE ADMIN</h1>
-          <button onClick={logout} className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-bold">LOGOUT</button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => showToast("✓ All changes saved and applied successfully!")}
+              className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all hover:scale-105"
+            >
+              SAVE CHANGES
+            </button>
+            <button onClick={logout} className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-bold">LOGOUT</button>
+          </div>
         </div>
 
         {/* ═══════════════════════════════════════════ */}
@@ -272,9 +294,14 @@ function BannerSection() {
         {(settings.bannerSlides || []).map((slide, i) => (
           <div key={slide.id} className="bg-white/5 border border-white/10 p-4 rounded-xl relative group">
             <button
-              onClick={() => updateSettings({ bannerSlides: settings.bannerSlides.filter(s => s.id !== slide.id) })}
-              className="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-            >×</button>
+              onClick={() => {
+                updateSettings({ bannerSlides: settings.bannerSlides.filter(s => s.id !== slide.id) });
+              }}
+              className="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 z-10 font-bold"
+              title="Delete Category"
+            >
+              ×
+            </button>
             {slide.image && <img src={slide.image} alt="" className="w-full h-32 object-contain bg-black/50 rounded mb-4" />}
             <input
               type="text" value={slide.text}
@@ -375,13 +402,16 @@ function ProductEditor({
           <div>
             <label className="block text-sm text-gray-400 mb-2 font-bold">Gallery Images (Multiple)</label>
             <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-              {(product.gallery || []).map((img, i) => (
+               {(product.gallery || []).map((img, i) => (
                 <div key={i} className="relative group">
                   <img src={img} alt="" className="w-full aspect-square object-contain bg-black/50 rounded-lg p-1" />
                   <button
                     onClick={() => onUpdateGallery(product.gallery.filter((_, idx) => idx !== i))}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                  >×</button>
+                    className="absolute -top-1 -right-1 bg-red-600 hover:bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs shadow-sm transition-all hover:scale-110 font-bold"
+                    title="Delete Image"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
               <label className="cursor-pointer border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center justify-center aspect-square text-gray-400 hover:text-green-400 hover:border-green-500 transition-colors text-xs">
