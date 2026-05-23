@@ -24,6 +24,30 @@ function Index() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = e.targetTouches[0].clientX; // prevent trigger on single tap
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diffX = touchStartX.current - touchEndX.current;
+    const threshold = 50;
+    if (diffX > threshold) {
+      // Swiped left -> show next product
+      setCurrentIndex((prev) => (prev + 1) % activeProducts.length);
+    } else if (diffX < -threshold) {
+      // Swiped right -> show previous product
+      setCurrentIndex((prev) => (prev - 1 + activeProducts.length) % activeProducts.length);
+    }
+  };
+
   const scroll = (offset: number) => {
     if (scrollRef.current) scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
   };
@@ -75,13 +99,19 @@ function Index() {
       <section className="relative bg-waves text-foreground min-h-[100vh] overflow-hidden">
         <SiteHeader />
 
-        <div className="relative pt-24 md:pt-32 pb-16 px-6 md:px-10 max-w-7xl mx-auto">
+        <div className="relative pt-16 md:pt-32 pb-4 md:pb-16 px-4 md:px-10 max-w-7xl mx-auto">
           
-          <div className="grid md:grid-cols-2 gap-12 items-center mt-10">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-12 items-center mt-4 md:mt-10">
             {/* Left side: Tilted product image */}
-            <div className="relative mx-auto max-w-lg w-full flex items-center justify-center p-6 md:p-10 order-2 md:order-1" style={{ transform: "rotate(-2deg)" }}>
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="relative mx-auto max-w-lg w-full flex items-center justify-center p-2 md:p-10 order-1 md:order-1" 
+              style={{ transform: "rotate(-2deg)" }}
+            >
               <div className="glow-halo" />
-              <div className="hero-card relative p-10 w-full h-[400px] md:h-[500px] flex items-center justify-center">
+              <div className="hero-card relative p-4 md:p-10 w-full h-[220px] md:h-[500px] flex items-center justify-center">
                 <img
                   key={rawProduct.slug}
                   src={rawProduct.img}
@@ -92,32 +122,37 @@ function Index() {
             </div>
 
             {/* Right side: Product Info */}
-            <div className="spotlight-card p-8 md:p-12 relative min-h-[400px] md:min-h-[500px] flex flex-col justify-center order-1 md:order-2">
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="text-[10px] tracking-[0.2em] font-black px-2 py-1 border border-white/20 text-white bg-white/5">{t("KRISHNA SCALE")}</span>
-                <span className="text-[10px] tracking-[0.2em] font-black px-2 py-1 border border-white/20 text-white bg-white/5">{t("INDUSTRIAL GRADE")}</span>
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="spotlight-card p-4 sm:p-6 md:p-12 relative min-h-[220px] md:min-h-[500px] flex flex-col justify-center order-2 md:order-2"
+            >
+              <div className="flex flex-wrap gap-1.5 mb-2 md:mb-6">
+                <span className="text-[9px] tracking-[0.2em] font-black px-1.5 py-0.5 border border-white/20 text-white bg-white/5">{t("KRISHNA SCALE")}</span>
+                <span className="text-[9px] tracking-[0.2em] font-black px-1.5 py-0.5 border border-white/20 text-white bg-white/5">{t("INDUSTRIAL GRADE")}</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#f3f6fb] leading-[1.2] md:leading-[1.1] tracking-tight">
+              <h1 className="text-xl sm:text-3xl md:text-5xl font-extrabold text-[#f3f6fb] leading-[1.2] md:leading-[1.1] tracking-tight">
                 {t("Precision Industrial Weighing Solutions")}
               </h1>
-              <div className="mt-8 space-y-4 text-sm text-gray-400 max-w-md">
-                <p className="text-xs tracking-[0.2em] font-bold text-gray-300 uppercase">
+              <div className="mt-3 md:mt-8 space-y-2 md:space-y-4 text-xs md:text-sm text-gray-400 max-w-md">
+                <p className="text-[10px] md:text-xs tracking-[0.2em] font-bold text-gray-300 uppercase">
                   {heroProduct.name} <span className="opacity-50 mx-2">•</span> {heroProduct.capacity}
                 </p>
-                <p className="text-base md:text-lg opacity-90 leading-relaxed text-gray-300">{t("Manufacturing, distribution, and calibration of high-capacity scales across Gujarat.")}</p>
+                <p className="text-sm md:text-lg opacity-90 leading-relaxed text-gray-300 hidden sm:block">{t("Manufacturing, distribution, and calibration of high-capacity scales across Gujarat.")}</p>
               </div>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <Link to={`/products/${rawProduct.slug}`} className="pill-btn pill-btn-dark w-full sm:w-auto text-center justify-center">
-                  {t("EXPLORE PRODUCT")}
+              <div className="mt-4 md:mt-10 flex flex-row gap-2.5">
+                <Link to={`/products/${rawProduct.slug}`} className="pill-btn pill-btn-dark flex-1 sm:flex-none text-[10px] md:text-sm py-2 px-4 text-center justify-center">
+                  {t("EXPLORE")}
                 </Link>
-                <a href={`https://wa.me/${contact.whatsappNumber || "919033621801"}?text=Hi, I want a quote for industrial scales.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-white text-black hover:bg-gray-200 w-full sm:w-auto text-center justify-center">
-                  {t("GET A QUOTE")}
+                <a href={`https://wa.me/${contact.whatsappNumber || "919033621801"}?text=Hi, I want a quote for industrial scales.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-white text-black hover:bg-gray-200 flex-1 sm:flex-none text-[10px] md:text-sm py-2 px-4 text-center justify-center">
+                  {t("GET QUOTE")}
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="mt-16 flex items-center justify-center md:justify-end gap-3 flex-wrap">
+          <div className="mt-4 md:mt-16 flex items-center justify-center md:justify-end gap-2 md:gap-3 flex-wrap">
             <div className="text-[10px] tracking-[0.25em] text-muted-foreground mr-2 uppercase w-full md:w-auto text-center md:text-left mb-2 md:mb-0">{t("Switch Product Preview")}</div>
             {activeProducts.map((a, i) => (
               <button 
