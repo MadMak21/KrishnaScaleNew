@@ -73,6 +73,10 @@ interface AdminStore {
   isLoggedIn: boolean;
   login: () => void;
   logout: () => void;
+  isInquiryOpen: boolean;
+  inquiryProductSlug: string | null;
+  openInquiry: (slug?: string | null) => void;
+  closeInquiry: () => void;
 }
 
 /* ── Defaults from data.ts ── */
@@ -203,6 +207,10 @@ export const useAdminStore = create<AdminStore>()(
       isLoggedIn: false,
       login: () => set({ isLoggedIn: true }),
       logout: () => set({ isLoggedIn: false }),
+      isInquiryOpen: false,
+      inquiryProductSlug: null,
+      openInquiry: (slug = null) => set({ isInquiryOpen: true, inquiryProductSlug: slug }),
+      closeInquiry: () => set({ isInquiryOpen: false, inquiryProductSlug: null }),
     }),
     {
       name: 'admin-storage',

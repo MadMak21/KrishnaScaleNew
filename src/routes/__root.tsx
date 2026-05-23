@@ -7,6 +7,8 @@ import {
 } from "@tanstack/react-router";
 
 import "../lib/i18n";
+import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
+import { InquiryModal } from "@/components/InquiryModal";
 
 function NotFoundComponent() {
   return (
@@ -77,6 +79,8 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <WhatsAppFloatingButton />
+      <InquiryModal />
     </QueryClientProvider>
   );
 }

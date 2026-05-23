@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { settings } = useAdminStore();
+  const { settings, openInquiry } = useAdminStore();
   const { t, i18n } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -191,6 +191,46 @@ function Index() {
         </div>
       </section>
 
+      {/* TRUST ASSURANCE BADGES (COMPETITOR-INSPIRED TRUST CARDS) */}
+      <section className="bg-[#020817] py-16 px-6 border-b border-white/5">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Card 1: Certified Solutions */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center hover:bg-white/10 hover:border-white/20 transition-all cursor-default group shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-[#f97316]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg className="w-8 h-8 text-[#f97316]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-black text-white tracking-wide uppercase italic mb-2">{t("Certified Solutions")}</h4>
+            <p className="text-sm text-gray-400 max-w-xs">{t("Verified accuracy & high quality engineering standards across all products.")}</p>
+          </div>
+
+          {/* Card 2: Government Approved */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center hover:bg-white/10 hover:border-white/20 transition-all cursor-default group shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-[#f97316]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg className="w-8 h-8 text-[#f97316]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-black text-white tracking-wide uppercase italic mb-2">{t("Government Approved")}</h4>
+            <p className="text-sm text-gray-400 max-w-xs">{t("Fully licensed scale manufacturers with authorized stamping & calibration services.")}</p>
+          </div>
+
+          {/* Card 3: Trusted Partner */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center hover:bg-white/10 hover:border-white/20 transition-all cursor-default group shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-[#f97316]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg className="w-8 h-8 text-[#f97316]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-black text-white tracking-wide uppercase italic mb-2">{t("Trusted Partner")}</h4>
+            <p className="text-sm text-gray-400 max-w-xs">{t("Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.")}</p>
+          </div>
+
+        </div>
+      </section>
+
       {/* PRODUCTS ROW */}
       <section id="explore" className="bg-[#020817] text-foreground py-24 px-6 md:px-10 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
@@ -275,9 +315,12 @@ function Index() {
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
             {t("We provide custom platform sizes, specialized capacities, and annual maintenance contracts (AMC) for large industrial setups.")}
           </p>
-          <a href={`mailto:${contact.inquiryEmail || "sales@krishnascale.com"}`} className="pill-btn bg-red-600 text-white border-none hover:bg-red-500 text-sm md:text-base px-8 py-4">
+          <button 
+            onClick={() => openInquiry()} 
+            className="pill-btn bg-red-600 text-white border-none hover:bg-red-500 text-sm md:text-base px-8 py-4 cursor-pointer"
+          >
             {t("CONTACT SALES TEAM")}
-          </a>
+          </button>
         </div>
       </section>
 

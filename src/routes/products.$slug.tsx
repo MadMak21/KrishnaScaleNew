@@ -33,7 +33,7 @@ function ProductDetail() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language as 'en'|'hi'|'gu') || 'en';
   
-  const { settings } = useAdminStore();
+  const { settings, openInquiry } = useAdminStore();
   const allStoreProducts = settings?.products && settings.products.length > 0 ? settings.products : products;
   
   const rawProduct = allStoreProducts.find((p) => p.slug === loaderProduct.slug) || loaderProduct;
@@ -192,9 +192,12 @@ function ProductDetail() {
             <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center">
               {t("WHATSAPP INQUIRY")}
             </a>
-            <a href={`mailto:${settings.contactInfo?.inquiryEmail || "sales@krishnascale.com"}?subject=Inquiry: ${product.name}`} className="pill-btn text-center border-white/20 hover:bg-white/10 text-white">
+            <button 
+              onClick={() => openInquiry(rawProduct.slug)} 
+              className="pill-btn text-center border-white/20 hover:bg-white/10 text-white cursor-pointer"
+            >
               {t("MAIL INQUIRY")}
-            </a>
+            </button>
           </div>
 
           {/* RELATED PRODUCTS */}
@@ -240,9 +243,12 @@ function ProductDetail() {
         <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="flex-1 pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center justify-center text-xs py-3">
           WHATSAPP
         </a>
-        <a href={`mailto:${settings.contactInfo?.inquiryEmail || "sales@krishnascale.com"}?subject=Inquiry: ${product.name}`} className="flex-1 pill-btn text-center border-white/20 hover:bg-white/10 text-white justify-center text-xs py-3">
+        <button 
+          onClick={() => openInquiry(rawProduct.slug)} 
+          className="flex-1 pill-btn text-center border-white/20 hover:bg-white/10 text-white justify-center text-xs py-3 cursor-pointer"
+        >
           EMAIL
-        </a>
+        </button>
       </div>
     </main>
   );
