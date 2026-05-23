@@ -99,7 +99,7 @@ function Index() {
       <section className="relative bg-waves text-foreground min-h-[100vh] overflow-hidden">
         <SiteHeader />
 
-        <div className="relative pt-28 md:pt-32 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
+        <div className="relative pt-20 md:pt-32 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
           
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mt-6 md:mt-10">
             {/* Left side: Tilted product image */}
@@ -110,7 +110,7 @@ function Index() {
               className="relative mx-auto max-w-lg w-full flex items-center justify-center p-2 md:p-10 order-1 md:order-1" 
             >
               <div className="glow-halo" />
-              <div className="hero-card relative p-6 md:p-10 w-full h-[260px] md:h-[500px] flex items-center justify-center">
+              <div className="hero-card relative p-6 md:p-10 w-full h-[300px] md:h-[500px] flex items-center justify-center">
                 <img
                   key={rawProduct.slug}
                   src={rawProduct.img}
