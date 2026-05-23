@@ -42,8 +42,9 @@ function Index() {
     return () => window.removeEventListener('resize', handleScroll);
   }, []);
 
-  const allStoreProducts = settings.products && settings.products.length > 0 ? settings.products : products;
-  const displayProducts = allStoreProducts.filter(p => settings.visibleProducts.includes(p.slug));
+  const allStoreProducts = settings?.products && settings.products.length > 0 ? settings.products : products;
+  const visibleSlugs = settings?.visibleProducts || products.map(p => p.slug);
+  const displayProducts = allStoreProducts.filter(p => visibleSlugs.includes(p.slug));
   const activeProducts = displayProducts.length > 0 ? displayProducts : allStoreProducts;
 
   useEffect(() => {
@@ -55,14 +56,18 @@ function Index() {
 
   const rawProduct = activeProducts[currentIndex % activeProducts.length] || activeProducts[0];
   const lang = (i18n.language as 'en'|'hi'|'gu') || 'en';
-  const heroProduct = rawProduct.translations[lang] || rawProduct.translations.en;
+  const heroProduct = rawProduct?.translations?.[lang] || rawProduct?.translations?.en || {};
 
   const maskStyle = {
     maskImage: `linear-gradient(to right, ${canScrollLeft ? 'transparent' : 'black'}, black 10%, black 90%, ${canScrollRight ? 'transparent' : 'black'})`,
     WebkitMaskImage: `linear-gradient(to right, ${canScrollLeft ? 'transparent' : 'black'}, black 10%, black 90%, ${canScrollRight ? 'transparent' : 'black'})`
   };
 
-  const contact = settings.contactInfo;
+  const contact = settings?.contactInfo || {
+    whatsappNumber: '919033621801',
+    inquiryEmail: 'sales@krishnascale.in',
+    phoneDisplay: '+91 90336 21801',
+  };
 
   return (
     <main>

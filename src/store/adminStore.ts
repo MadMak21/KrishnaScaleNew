@@ -206,6 +206,32 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'admin-storage',
+      merge: (persistedState: any, currentState: any) => {
+        if (!persistedState) return currentState;
+        const persisted = persistedState as any;
+        const current = currentState as any;
+        return {
+          ...current,
+          ...persisted,
+          settings: {
+            ...current.settings,
+            ...(persisted.settings || {}),
+            contactInfo: {
+              ...current.settings.contactInfo,
+              ...(persisted.settings?.contactInfo || {}),
+            },
+            exploreConfig: {
+              ...current.settings.exploreConfig,
+              ...(persisted.settings?.exploreConfig || {}),
+            },
+            bannerSlides: persisted.settings?.bannerSlides || current.settings.bannerSlides,
+            products: persisted.settings?.products && persisted.settings.products.length > 0
+              ? persisted.settings.products
+              : current.settings.products,
+            visibleProducts: persisted.settings?.visibleProducts || current.settings.visibleProducts,
+          }
+        };
+      }
     }
   )
 );

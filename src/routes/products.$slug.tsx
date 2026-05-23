@@ -34,15 +34,15 @@ function ProductDetail() {
   const lang = (i18n.language as 'en'|'hi'|'gu') || 'en';
   
   const { settings } = useAdminStore();
-  const allStoreProducts = settings.products && settings.products.length > 0 ? settings.products : products;
+  const allStoreProducts = settings?.products && settings.products.length > 0 ? settings.products : products;
   
   const rawProduct = allStoreProducts.find((p) => p.slug === loaderProduct.slug) || loaderProduct;
-  const product = rawProduct.translations[lang] || rawProduct.translations.en;
+  const product = rawProduct?.translations?.[lang] || rawProduct?.translations?.en || {};
   
-  const exploreConfig = settings.exploreConfig[rawProduct.slug] || { relatedProducts: [], galleryImagesCount: 4 };
+  const exploreConfig = settings?.exploreConfig?.[rawProduct.slug] || { relatedProducts: [], galleryImagesCount: 4 };
 
   const defaultRelated = allStoreProducts.filter(p => p.slug !== rawProduct.slug).slice(0, 4);
-  const relatedProducts = exploreConfig.relatedProducts.length > 0 
+  const relatedProducts = exploreConfig.relatedProducts && exploreConfig.relatedProducts.length > 0 
     ? exploreConfig.relatedProducts.map(slug => allStoreProducts.find(p => p.slug === slug)).filter(Boolean) as typeof allStoreProducts
     : defaultRelated;
   const [activeImgIdx, setActiveImgIdx] = useState(0);
