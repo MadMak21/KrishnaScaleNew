@@ -99,7 +99,7 @@ function Index() {
       <section className="relative bg-waves text-foreground min-h-[100vh] overflow-hidden">
         <SiteHeader />
 
-        <div className="relative pt-6 md:pt-16 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
+        <div className="relative pt-20 md:pt-28 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
           
           <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center mt-2 md:mt-10">
             {/* Left side: Tilted product image */}

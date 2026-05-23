@@ -7,7 +7,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#020817]/75 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-300">
+    <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 md:px-10 py-5">
       <Link to="/" className="stencil-box text-foreground text-xs md:text-sm tracking-widest px-2.5 py-1 md:py-1.5 hover:text-orange-500 transition-colors">
         {t("KRISHNA SCALE")}
       </Link>
@@ -16,7 +16,6 @@ export function SiteHeader() {
       <nav className="hidden md:flex items-center gap-10">
         <Link to="/" className="nav-link">{t("HOME")}</Link>
         <a href="/#explore" className="nav-link">{t("PRODUCTS")}</a>
-        <Link to="/admin" className="nav-link text-orange-500 hover:text-orange-400 font-bold">{t("CMS ADMIN")}</Link>
       </nav>
       
       {/* Desktop Language Selectors */}
@@ -60,32 +59,9 @@ export function SiteHeader() {
 
       {/* Mobile Full-Screen Overlay Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-[#020817]/98 backdrop-blur-2xl z-40 flex flex-col items-center justify-center gap-10 animate-in fade-in duration-300 md:hidden">
-          <nav className="flex flex-col items-center gap-8">
-            <Link 
-              to="/" 
-              onClick={() => setMenuOpen(false)}
-              className="text-2xl font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase"
-            >
-              {t("HOME")}
-            </Link>
-            <a 
-              href="/#explore" 
-              onClick={() => setMenuOpen(false)}
-              className="text-2xl font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase"
-            >
-              {t("PRODUCTS")}
-            </a>
-            <Link 
-              to="/admin" 
-              onClick={() => setMenuOpen(false)}
-              className="text-2xl font-black tracking-widest text-orange-500 hover:text-orange-400 transition-colors uppercase"
-            >
-              {t("CMS ADMIN")}
-            </Link>
-          </nav>
-          
-          <div className="flex flex-col items-center gap-4 border-t border-white/10 pt-8 w-[85%] max-w-xs">
+        <div className="fixed inset-0 bg-[#020817]/98 backdrop-blur-2xl z-40 flex flex-col items-center justify-center gap-12 animate-in fade-in duration-300 md:hidden">
+          {/* Language Switcher at the Top */}
+          <div className="flex flex-col items-center gap-4 w-[85%] max-w-xs">
             <span className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase font-bold">{t("Select Language")}</span>
             <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-xl border border-white/10 w-full justify-around">
               <button 
@@ -108,6 +84,24 @@ export function SiteHeader() {
               </button>
             </div>
           </div>
+
+          {/* Options (Home and Products) Below */}
+          <nav className="flex flex-col items-center gap-8 border-t border-white/10 pt-10 w-[85%] max-w-xs">
+            <Link 
+              to="/" 
+              onClick={() => setMenuOpen(false)}
+              className="text-2xl font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase"
+            >
+              {t("HOME")}
+            </Link>
+            <a 
+              href="/#explore" 
+              onClick={() => setMenuOpen(false)}
+              className="text-2xl font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase"
+            >
+              {t("PRODUCTS")}
+            </a>
+          </nav>
         </div>
       )}
     </header>
