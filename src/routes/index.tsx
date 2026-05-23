@@ -42,8 +42,9 @@ function Index() {
     return () => window.removeEventListener('resize', handleScroll);
   }, []);
 
-  const displayProducts = products.filter(p => settings.visibleProducts.includes(p.slug));
-  const activeProducts = displayProducts.length > 0 ? displayProducts : products;
+  const allStoreProducts = settings.products && settings.products.length > 0 ? settings.products : products;
+  const displayProducts = allStoreProducts.filter(p => settings.visibleProducts.includes(p.slug));
+  const activeProducts = displayProducts.length > 0 ? displayProducts : allStoreProducts;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -60,6 +61,8 @@ function Index() {
     maskImage: `linear-gradient(to right, ${canScrollLeft ? 'transparent' : 'black'}, black 10%, black 90%, ${canScrollRight ? 'transparent' : 'black'})`,
     WebkitMaskImage: `linear-gradient(to right, ${canScrollLeft ? 'transparent' : 'black'}, black 10%, black 90%, ${canScrollRight ? 'transparent' : 'black'})`
   };
+
+  const contact = settings.contactInfo;
 
   return (
     <main>
@@ -102,7 +105,7 @@ function Index() {
                 <Link to={`/products/${rawProduct.slug}`} className="pill-btn pill-btn-dark w-full sm:w-auto text-center justify-center">
                   {t("EXPLORE PRODUCT")}
                 </Link>
-                <a href={`https://wa.me/919033621801?text=Hi, I want a quote for industrial scales.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-white text-black hover:bg-gray-200 w-full sm:w-auto text-center justify-center">
+                <a href={`https://wa.me/${contact.whatsappNumber || "919033621801"}?text=Hi, I want a quote for industrial scales.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-white text-black hover:bg-gray-200 w-full sm:w-auto text-center justify-center">
                   {t("GET A QUOTE")}
                 </a>
               </div>
@@ -116,9 +119,9 @@ function Index() {
                 key={a.slug} 
                 onClick={() => setCurrentIndex(i)}
                 className={`thumb-strip block hover:ring-2 hover:ring-white/50 transition-all ${currentIndex === i ? 'ring-2 ring-white scale-110 active' : 'opacity-60 hover:opacity-100'}`}
-                title={a.name}
+                title={a.translations[lang]?.name || a.translations.en.name}
               >
-                <img src={a.img} alt={a.name} className="w-full h-full object-contain p-2" loading="lazy" />
+                <img src={a.img} alt={a.translations[lang]?.name || a.translations.en.name} className="w-full h-full object-contain p-2" loading="lazy" />
               </button>
             ))}
           </div>
@@ -225,7 +228,7 @@ function Index() {
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
             {t("We provide custom platform sizes, specialized capacities, and annual maintenance contracts (AMC) for large industrial setups.")}
           </p>
-          <a href="mailto:sales@krishnascale.com" className="pill-btn bg-red-600 text-white border-none hover:bg-red-500 text-sm md:text-base px-8 py-4">
+          <a href={`mailto:${contact.inquiryEmail || "sales@krishnascale.com"}`} className="pill-btn bg-red-600 text-white border-none hover:bg-red-500 text-sm md:text-base px-8 py-4">
             {t("CONTACT SALES TEAM")}
           </a>
         </div>

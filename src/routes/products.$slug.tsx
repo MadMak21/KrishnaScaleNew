@@ -8,7 +8,11 @@ import { useAdminStore } from "@/store/adminStore";
 
 export const Route = createFileRoute("/products/$slug")({
   loader: ({ params }) => {
-    const product = products.find((p) => p.slug === params.slug);
+    const storeProducts = useAdminStore.getState().settings?.products || [];
+    let product = storeProducts.find((p) => p.slug === params.slug);
+    if (!product) {
+      product = products.find((p) => p.slug === params.slug);
+    }
     if (!product) throw notFound();
     return { product };
   },
@@ -25,17 +29,21 @@ export const Route = createFileRoute("/products/$slug")({
 });
 
 function ProductDetail() {
-  const { product: rawProduct } = Route.useLoaderData();
+  const { product: loaderProduct } = Route.useLoaderData();
   const { t, i18n } = useTranslation();
   const lang = (i18n.language as 'en'|'hi'|'gu') || 'en';
-  const product = rawProduct.translations[lang] || rawProduct.translations.en;
   
   const { settings } = useAdminStore();
+  const allStoreProducts = settings.products && settings.products.length > 0 ? settings.products : products;
+  
+  const rawProduct = allStoreProducts.find((p) => p.slug === loaderProduct.slug) || loaderProduct;
+  const product = rawProduct.translations[lang] || rawProduct.translations.en;
+  
   const exploreConfig = settings.exploreConfig[rawProduct.slug] || { relatedProducts: [], galleryImagesCount: 4 };
 
-  const defaultRelated = products.filter(p => p.slug !== rawProduct.slug).slice(0, 4);
+  const defaultRelated = allStoreProducts.filter(p => p.slug !== rawProduct.slug).slice(0, 4);
   const relatedProducts = exploreConfig.relatedProducts.length > 0 
-    ? exploreConfig.relatedProducts.map(slug => products.find(p => p.slug === slug)).filter(Boolean) as typeof products
+    ? exploreConfig.relatedProducts.map(slug => allStoreProducts.find(p => p.slug === slug)).filter(Boolean) as typeof allStoreProducts
     : defaultRelated;
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -47,7 +55,7 @@ function ProductDetail() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const baseImages = rawProduct.gallery?.length ? rawProduct.gallery : [rawProduct.img, rawProduct.img, rawProduct.img];
+  const baseImages = rawProduct.gallery && rawProduct.gallery.length > 0 ? rawProduct.gallery : [rawProduct.img];
   const displayImages = baseImages.slice(0, exploreConfig.galleryImagesCount || 4);
   const activeImage = displayImages[activeImgIdx] || displayImages[0];
 
@@ -156,23 +164,23 @@ function ProductDetail() {
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
                       <th className="px-6 py-4 font-bold text-gray-400">Accuracy</th>
-                      <td className="px-6 py-4 text-white font-medium">Standard Class III / Heavy Duty</td>
+                      <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.accuracy || "Standard Class III / Heavy Duty"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
                       <th className="px-6 py-4 font-bold text-gray-400">Material</th>
-                      <td className="px-6 py-4 text-white font-medium">MS / SS (Industrial Grade)</td>
+                      <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.material || "MS / SS (Industrial Grade)"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
                       <th className="px-6 py-4 font-bold text-gray-400">Display Type</th>
-                      <td className="px-6 py-4 text-white font-medium">High Brightness Red/Green LED</td>
+                      <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.displayType || "High Brightness Red/Green LED"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
                       <th className="px-6 py-4 font-bold text-gray-400">Battery Backup</th>
-                      <td className="px-6 py-4 text-white font-medium">Up to 48 Hours In-built</td>
+                      <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.batteryBackup || "Up to 48 Hours In-built"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
                       <th className="px-6 py-4 font-bold text-gray-400">Warranty</th>
-                      <td className="px-6 py-4 text-white font-medium">1 Year Manufacturer Warranty</td>
+                      <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.warranty || "1 Year Manufacturer Warranty"}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -181,10 +189,10 @@ function ProductDetail() {
           </div>
 
           <div className="mt-16 hidden md:flex gap-6 justify-start">
-            <a href={`https://wa.me/919033621801?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center">
+            <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center">
               {t("WHATSAPP INQUIRY")}
             </a>
-            <a href={`mailto:sales@krishnascale.com?subject=Inquiry: ${product.name}`} className="pill-btn text-center border-white/20 hover:bg-white/10 text-white">
+            <a href={`mailto:${settings.contactInfo?.inquiryEmail || "sales@krishnascale.com"}?subject=Inquiry: ${product.name}`} className="pill-btn text-center border-white/20 hover:bg-white/10 text-white">
               {t("MAIL INQUIRY")}
             </a>
           </div>
@@ -229,10 +237,10 @@ function ProductDetail() {
       
       {/* STICKY MOBILE CTA */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#020817] border-t border-white/10 p-4 z-50 flex gap-3 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
-        <a href={`https://wa.me/919033621801?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="flex-1 pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center justify-center text-xs py-3">
+        <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="flex-1 pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center justify-center text-xs py-3">
           WHATSAPP
         </a>
-        <a href={`mailto:sales@krishnascale.com?subject=Inquiry: ${product.name}`} className="flex-1 pill-btn text-center border-white/20 hover:bg-white/10 text-white justify-center text-xs py-3">
+        <a href={`mailto:${settings.contactInfo?.inquiryEmail || "sales@krishnascale.com"}?subject=Inquiry: ${product.name}`} className="flex-1 pill-btn text-center border-white/20 hover:bg-white/10 text-white justify-center text-xs py-3">
           EMAIL
         </a>
       </div>
