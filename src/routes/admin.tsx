@@ -152,8 +152,9 @@ function AdminPage() {
         {/* 4. PRODUCT VISIBILITY */}
         {/* ═══════════════════════════════════════════ */}
         <section className="bg-black/30 p-6 md:p-8 rounded-2xl border border-white/10">
-          <h2 className="text-2xl font-bold mb-2 text-green-400">Products List Visibility</h2>
-          <p className="text-gray-400 mb-4 text-sm">Toggle which products show on the homepage.</p>
+          <h2 className="text-2xl font-bold mb-2 text-green-400">Top Hero Spotlight & Homepage Visibility</h2>
+          <p className="text-sm font-semibold text-yellow-400 mb-2">Controls the main Top Spotlight Banner, the Switch Product Preview thumbnail strip, and the homepage product grids.</p>
+          <p className="text-xs text-gray-400 mb-6">Toggle off any products you wish to completely hide from the main top banner and the website's explore lists.</p>
           <div className="flex flex-wrap gap-4">
             {storeProducts.map(p => {
               const isVisible = settings.visibleProducts.includes(p.slug);
@@ -288,8 +289,8 @@ function BannerSection() {
 
   return (
     <section className="bg-black/30 p-6 md:p-8 rounded-2xl border border-white/10">
-      <h2 className="text-2xl font-bold mb-2 text-green-400">Banner / Marquee Settings</h2>
-      <p className="text-sm text-gray-400 mb-6">Upload custom images and text to scroll in the marquee.</p>
+      <h2 className="text-2xl font-bold mb-2 text-green-400">Bottom Category Marquee Settings</h2>
+      <p className="text-sm text-gray-400 mb-6">Upload custom images and text to scroll in the infinite category marquee at the bottom of the homepage.</p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {(settings.bannerSlides || []).map((slide, i) => (
           <div key={slide.id} className="bg-white/5 border border-white/10 p-4 rounded-xl relative group">
