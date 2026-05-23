@@ -9,7 +9,7 @@ import { useAdminStore } from "@/store/adminStore";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Krishna Scale — Digital Weighing Scales" },
+      { title: "Krishna Scale" },
       { name: "description", content: "Explore industrial and commercial digital weighing scales." },
     ],
   }),
