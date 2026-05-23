@@ -131,14 +131,16 @@ function Index() {
                 <span className="text-[9px] tracking-[0.2em] font-black px-2 py-0.5 border border-white/20 text-white bg-white/5">{t("KRISHNA SCALE")}</span>
                 <span className="text-[9px] tracking-[0.2em] font-black px-2 py-0.5 border border-white/20 text-white bg-white/5">{t("INDUSTRIAL GRADE")}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-[#f3f6fb] leading-[1.2] md:leading-[1.1] tracking-tight">
-                {t("Precision Industrial Weighing Solutions")}
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-[#f3f6fb] leading-[1.2] md:leading-[1.1] tracking-tight uppercase">
+                {heroProduct.sub || t("Precision Industrial Weighing Solutions")}
               </h1>
               <div className="mt-3 md:mt-8 space-y-2 md:space-y-4 text-xs md:text-sm text-gray-400 max-w-md">
-                <p className="text-[10px] md:text-xs tracking-[0.2em] font-bold text-gray-300 uppercase">
-                  {heroProduct.name} <span className="opacity-50 mx-2">•</span> {heroProduct.capacity}
+                <p className="text-[10px] md:text-xs tracking-[0.2em] font-bold text-orange-500 uppercase">
+                  {heroProduct.name} <span className="opacity-50 mx-2 text-white">•</span> {heroProduct.capacity}
                 </p>
-                <p className="text-sm md:text-lg opacity-90 leading-relaxed text-gray-300 hidden sm:block">{t("Manufacturing, distribution, and calibration of high-capacity scales across Gujarat.")}</p>
+                <p className="text-sm md:text-lg opacity-90 leading-relaxed text-gray-300 hidden sm:block">
+                  {heroProduct.description || t("Manufacturing, distribution, and calibration of high-capacity scales across Gujarat.")}
+                </p>
               </div>
               <div className="mt-6 md:mt-10 flex flex-row gap-3">
                 <Link to={`/products/${rawProduct.slug}`} className="pill-btn pill-btn-dark flex-1 sm:flex-none text-[10px] md:text-sm py-2.5 px-5 text-center justify-center">
