@@ -170,13 +170,19 @@ function Index() {
             </div>
           </div>
           <div ref={scrollRef} onScroll={handleScroll} className="flex overflow-x-auto gap-4 md:gap-6 pb-8 pt-4 snap-x snap-mandatory hide-scroll" style={maskStyle}>
-            {activeProducts.map((p, idx) => {
+            {allStoreProducts.map((p, idx) => {
               const langProd = p.translations[lang] || p.translations.en;
+              const isActive = activeProducts[currentIndex % activeProducts.length]?.slug === p.slug;
               return (
                 <div 
                   key={p.slug}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`app-card w-[280px] md:w-[320px] flex-shrink-0 snap-center cursor-pointer flex flex-col ${currentIndex === idx ? 'border-white ring-1 ring-white/30' : ''}`}
+                  onClick={() => {
+                    const activeIdx = activeProducts.findIndex(ap => ap.slug === p.slug);
+                    if (activeIdx !== -1) {
+                      setCurrentIndex(activeIdx);
+                    }
+                  }}
+                  className={`app-card w-[280px] md:w-[320px] flex-shrink-0 snap-center cursor-pointer flex flex-col ${isActive ? 'border-white ring-1 ring-white/30' : ''}`}
                 >
                   <div className="h-[55%] w-full relative p-6 flex items-center justify-center border-b border-white/5 bg-[#0a1f38]/50">
                     <img src={p.img} alt={langProd.name} className="absolute inset-0 w-full h-full object-contain p-6 drop-shadow-2xl hover:scale-110 transition-transform duration-500" loading="lazy" />
