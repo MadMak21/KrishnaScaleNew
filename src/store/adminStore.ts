@@ -226,7 +226,35 @@ export const useAdminStore = create<AdminStore>()(
             },
             bannerSlides: persisted.settings?.bannerSlides || current.settings.bannerSlides,
             products: persisted.settings?.products && persisted.settings.products.length > 0
-              ? persisted.settings.products
+              ? persisted.settings.products.map((p: any) => {
+                  const defaultP = current.settings.products.find((dp: any) => dp.slug === p.slug || dp.id === p.id);
+                  if (!defaultP) return p;
+                  return {
+                    ...defaultP,
+                    ...p,
+                    translations: {
+                      en: {
+                        sub: defaultP.translations.en.sub || '',
+                        description: defaultP.translations.en.description || '',
+                        ...defaultP.translations.en,
+                        ...(p.translations?.en || {})
+                      },
+                      hi: {
+                        sub: defaultP.translations.hi.sub || '',
+                        description: defaultP.translations.hi.description || '',
+                        ...defaultP.translations.hi,
+                        ...(p.translations?.hi || {})
+                      },
+                      gu: {
+                        sub: defaultP.translations.gu.sub || '',
+                        description: defaultP.translations.gu.description || '',
+                        ...defaultP.translations.gu,
+                        ...(p.translations?.gu || {})
+                      },
+                    },
+                    specs: { ...defaultP.specs, ...(p.specs || {}) }
+                  };
+                })
               : current.settings.products,
             visibleProducts: persisted.settings?.visibleProducts || current.settings.visibleProducts,
           }

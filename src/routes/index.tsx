@@ -99,18 +99,18 @@ function Index() {
       <section className="relative bg-waves text-foreground min-h-[100vh] overflow-hidden">
         <SiteHeader />
 
-        <div className="relative pt-20 md:pt-32 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
+        <div className="relative pt-6 md:pt-16 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
           
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mt-6 md:mt-10">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center mt-2 md:mt-10">
             {/* Left side: Tilted product image */}
             <div 
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="relative mx-auto max-w-lg w-full flex items-center justify-center p-2 md:p-10 order-1 md:order-1" 
+              className="relative mx-auto max-w-lg w-full flex items-center justify-center p-0 md:p-10 order-1 md:order-1" 
             >
               <div className="glow-halo" />
-              <div className="hero-card relative p-6 md:p-10 w-full h-[300px] md:h-[500px] flex items-center justify-center">
+              <div className="hero-card relative p-6 md:p-10 w-full h-[280px] xs:h-[320px] sm:h-[360px] md:h-[500px] flex items-center justify-center">
                 <img
                   key={rawProduct.slug}
                   src={rawProduct.img}
@@ -125,7 +125,7 @@ function Index() {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="spotlight-card p-6 sm:p-8 md:p-12 relative min-h-[250px] md:min-h-[500px] flex flex-col justify-center order-2 md:order-2"
+              className="spotlight-card p-6 sm:p-8 md:p-12 relative min-h-[200px] md:min-h-[500px] flex flex-col justify-center order-2 md:order-2"
             >
               <div className="flex flex-wrap gap-1.5 mb-3 md:mb-6">
                 <span className="text-[9px] tracking-[0.2em] font-black px-2 py-0.5 border border-white/20 text-white bg-white/5">{t("KRISHNA SCALE")}</span>
@@ -138,7 +138,7 @@ function Index() {
                 <p className="text-[10px] md:text-xs tracking-[0.2em] font-bold text-orange-500 uppercase">
                   {heroProduct.name} <span className="opacity-50 mx-2 text-white">•</span> {heroProduct.capacity}
                 </p>
-                <p className="text-sm md:text-lg opacity-90 leading-relaxed text-gray-300 hidden sm:block">
+                <p className="text-xs sm:text-sm md:text-lg opacity-90 leading-relaxed text-gray-300">
                   {heroProduct.description || t("Manufacturing, distribution, and calibration of high-capacity scales across Gujarat.")}
                 </p>
               </div>
