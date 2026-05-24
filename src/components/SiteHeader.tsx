@@ -36,26 +36,59 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-5 bg-transparent overflow-visible">
-      <Link to="/" className="text-white text-xs md:text-sm font-black tracking-[0.2em] px-2 py-1 uppercase z-50">
-        {t("KRISHNA SCALE")}
-      </Link>
-      
-      {/* Right side Arrow Button & Tutorial */}
-      <div className="relative z-50">
+    <>
+      <header className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-5 bg-transparent overflow-visible">
+        <Link to="/" className="text-white text-xs md:text-sm font-black tracking-[0.2em] px-2 py-1 uppercase z-50">
+          {t("KRISHNA SCALE")}
+        </Link>
+        
+        {/* Desktop Navigation (Hidden on Mobile) */}
+        <div className="hidden md:flex items-center gap-8 z-50 bg-[#020817]/80 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
+          <Link to="/" className="text-xs font-bold tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase">
+            {t("HOME")}
+          </Link>
+          <button onClick={() => scrollToSection('explore')} className="text-xs font-bold tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase cursor-pointer">
+            {t("PRODUCTS")}
+          </button>
+          <button onClick={() => scrollToSection('location')} className="text-xs font-bold tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase cursor-pointer">
+            {t("LOCATION")}
+          </button>
+          <button onClick={() => scrollToSection('contact')} className="text-xs font-bold tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase cursor-pointer">
+            {t("CONTACT US")}
+          </button>
+
+          <div className="w-px h-4 bg-white/20 mx-2" />
+
+          {/* Desktop Language Switcher */}
+          <div className="flex items-center gap-2">
+            {(['en', 'hi', 'gu'] as const).map((lang) => (
+              <button 
+                key={lang}
+                onClick={() => i18n.changeLanguage(lang)}
+                className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === lang ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Sticky Arrow Button & Tutorial (Hidden on Desktop) */}
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 md:hidden flex items-center">
         {/* Tutorial Pointing Hand */}
         {showTutorial && !menuOpen && (
-          <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-3 animate-pulse pointer-events-none w-max">
+          <div className="absolute right-full mr-2 flex items-center gap-2 animate-pulse pointer-events-none w-max">
             <div className="bg-orange-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-md shadow-lg tracking-widest uppercase">
               Click to open menu
             </div>
-            <div className="text-3xl">👉</div>
+            <div className="text-2xl">👉</div>
           </div>
         )}
 
         <button 
           onClick={() => menuOpen ? setMenuOpen(false) : handleOpenMenu()}
-          className="text-white hover:text-orange-500 focus:outline-none p-2 transition-all cursor-pointer bg-black/20 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10"
+          className="text-white hover:text-orange-500 focus:outline-none p-3 pl-4 transition-all cursor-pointer bg-[#020817]/90 backdrop-blur-md border border-r-0 border-white/20 hover:bg-[#020817] shadow-[-5px_0_15px_rgba(0,0,0,0.5)] rounded-l-2xl"
           aria-label="Toggle menu"
         >
           {menuOpen ? (
@@ -73,13 +106,13 @@ export function SiteHeader() {
       {/* Background Overlay (Click to close) */}
       {menuOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-in fade-in duration-300"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-in fade-in duration-300 md:hidden"
           onClick={() => setMenuOpen(false)}
         />
       )}
 
-      {/* Side Drawer */}
-      <div className={`fixed top-0 right-0 bottom-0 w-72 sm:w-80 bg-[#020817] shadow-[-20px_0_40px_rgba(0,0,0,0.5)] z-50 transform transition-transform duration-300 ease-out border-l border-white/10 flex flex-col ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      {/* Mobile Side Drawer (Hidden on Desktop) */}
+      <div className={`fixed top-0 right-0 bottom-0 w-72 sm:w-80 bg-[#020817] shadow-[-20px_0_40px_rgba(0,0,0,0.5)] z-50 transform transition-transform duration-300 ease-out border-l border-white/10 flex flex-col md:hidden ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         
         {/* Drawer Header */}
         <div className="p-6 border-b border-white/10 flex justify-between items-center">
@@ -99,7 +132,7 @@ export function SiteHeader() {
               {(['en', 'hi', 'gu'] as const).map((lang) => (
                 <button 
                   key={lang}
-                  onClick={() => i18n.changeLanguage(lang)}
+                  onClick={() => { i18n.changeLanguage(lang); setMenuOpen(false); }}
                   className={`flex-1 py-2 text-xs font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === lang ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
                 >
                   {lang === 'en' ? 'EN' : lang === 'hi' ? 'HI' : 'GU'}
@@ -144,6 +177,6 @@ export function SiteHeader() {
         </div>
       </div>
 
-    </header>
+    </>
   );
 }

@@ -133,6 +133,13 @@ export const useAdminStore = create<AdminStore>()((set, get) => ({
 
   loadSettings: async () => {
     try {
+      // Skip Firebase if we are using the placeholder API key
+      if (import.meta.env.VITE_FIREBASE_API_KEY === undefined || import.meta.env.VITE_FIREBASE_API_KEY === "PLACEHOLDER_API_KEY") {
+        console.log("Using local default settings (Firebase not configured)");
+        set({ settings: defaultSettings, isLoaded: true });
+        return;
+      }
+
       const docRef = doc(db, 'config', 'settings');
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
