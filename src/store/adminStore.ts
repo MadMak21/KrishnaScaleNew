@@ -24,7 +24,7 @@ export interface AdminStore {
   isAuthenticated: boolean;
   isLoaded: boolean;
   settings: Settings;
-  login: (password: string) => boolean;
+  login: () => void;
   logout: () => void;
   updateSettings: (newSettings: Partial<Settings>) => Promise<void>;
   loadSettings: () => Promise<void>;
@@ -65,13 +65,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   openInquiry: () => set({ inquiryModalOpen: true }),
   closeInquiry: () => set({ inquiryModalOpen: false }),
 
-  login: (password: string) => {
-    if (password === 'admin123') { // Replace with strong auth in production
-      set({ isAuthenticated: true });
-      return true;
-    }
-    return false;
-  },
+  login: () => set({ isAuthenticated: true }),
   
   logout: () => set({ isAuthenticated: false }),
 
