@@ -83,16 +83,15 @@ function RootComponent() {
 
   useEffect(() => {
     loadSettings();
-    // Enforce minimum 1.5s loading time to ensure the custom GIF shows at least 1 full rotation
-    const timer = setTimeout(() => setMinLoadFinished(true), 1500);
+    // Enforce minimum 3s loading time to ensure the custom GIF shows at least 1 full rotation
+    const timer = setTimeout(() => setMinLoadFinished(true), 3000);
     return () => clearTimeout(timer);
   }, [loadSettings]);
 
   if (!isLoaded || !minLoadFinished) {
     return (
-      <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center">
-        <img src="/loader.gif" alt="Loading..." className="w-48 h-48 object-contain mb-4" />
-        <div className="mt-4 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
+      <div className="min-h-screen bg-[#020817] flex items-center justify-center">
+        <img src="/loader.gif" alt="Loading..." className="w-80 h-80 sm:w-96 sm:h-96 object-contain" />
       </div>
     );
   }
