@@ -9,9 +9,10 @@ export function SiteHeader() {
   const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
-    const tutorialSeen = localStorage.getItem("krishna_tutorial_seen");
+    const tutorialSeen = localStorage.getItem("krishna_tutorial_seen_v2");
     if (!tutorialSeen) {
-      setShowTutorial(true);
+      const timer = setTimeout(() => setShowTutorial(true), 1000);
+      return () => clearTimeout(timer);
     }
     
     let scrollTimeout: ReturnType<typeof setTimeout>;
@@ -28,7 +29,7 @@ export function SiteHeader() {
     setMenuOpen(true);
     if (showTutorial) {
       setShowTutorial(false);
-      localStorage.setItem("krishna_tutorial_seen", "true");
+      localStorage.setItem("krishna_tutorial_seen_v2", "true");
     }
   };
 
