@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase';
 
 /* ── Types ── */
 
+export type ProductData = typeof defaultProducts[0];
+
 export interface ContactInfo {
   whatsappNumber: string;
   inquiryEmail: string;
@@ -33,6 +35,15 @@ export interface AdminStore {
   inquiryModalOpen: boolean;
   openInquiry: () => void;
   closeInquiry: () => void;
+
+  updateContactInfo: (info: Partial<ContactInfo>) => Promise<void>;
+  updateExploreConfig: (slug: string, config: Partial<{ relatedProducts: string[], galleryImagesCount: number }>) => Promise<void>;
+  updateProduct: (slug: string, updates: Partial<ProductData>) => Promise<void>;
+  updateProductTranslation: (slug: string, lang: 'en'|'hi'|'gu', updates: Partial<ProductData['translations']['en']>) => Promise<void>;
+  updateProductSpecs: (slug: string, updates: Partial<ProductData['specs']>) => Promise<void>;
+  updateProductGallery: (slug: string, gallery: string[]) => Promise<void>;
+  addProduct: (product: ProductData) => Promise<void>;
+  removeProduct: (slug: string) => Promise<void>;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -149,5 +160,77 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         // Error is logged, but local state remains updated (optimistic)
       }
     }
+  },
+
+  updateContactInfo: async (info) => {
+    const current = get().settings.contactInfo;
+    await get().updateSettings({ contactInfo: { ...current, ...info } });
+  },
+  
+  updateExploreConfig: async (slug, config) => {
+    const current = get().settings.exploreConfig || {};
+    const productConfig = current[slug] || { relatedProducts: [], galleryImagesCount: 4 };
+    await get().updateSettings({ 
+      exploreConfig: { ...current, [slug]: { ...productConfig, ...config } } 
+    });
+  },
+
+  updateProduct: async (slug, updates) => {
+    const products = [...get().settings.products];
+    const index = products.findIndex(p => p.slug === slug);
+    if (index >= 0) {
+      products[index] = { ...products[index], ...updates };
+      await get().updateSettings({ products });
+    }
+  },
+
+  updateProductTranslation: async (slug, lang, updates) => {
+    const products = [...get().settings.products];
+    const index = products.findIndex(p => p.slug === slug);
+    if (index >= 0) {
+      const p = products[index];
+      products[index] = { 
+        ...p, 
+        translations: { 
+          ...p.translations, 
+          [lang]: { ...p.translations[lang as 'en'|'hi'|'gu'], ...updates } 
+        } 
+      };
+      await get().updateSettings({ products });
+    }
+  },
+
+  updateProductSpecs: async (slug, updates) => {
+    const products = [...get().settings.products];
+    const index = products.findIndex(p => p.slug === slug);
+    if (index >= 0) {
+      const p = products[index];
+      products[index] = { 
+        ...p, 
+        specs: { ...(p.specs || {}), ...updates } as any
+      };
+      await get().updateSettings({ products });
+    }
+  },
+
+  updateProductGallery: async (slug, gallery) => {
+    const products = [...get().settings.products];
+    const index = products.findIndex(p => p.slug === slug);
+    if (index >= 0) {
+      products[index] = { ...products[index], gallery };
+      await get().updateSettings({ products });
+    }
+  },
+
+  addProduct: async (product) => {
+    const products = [...get().settings.products, product];
+    const visibleProducts = [...get().settings.visibleProducts, product.slug];
+    await get().updateSettings({ products, visibleProducts });
+  },
+
+  removeProduct: async (slug) => {
+    const products = get().settings.products.filter(p => p.slug !== slug);
+    const visibleProducts = get().settings.visibleProducts.filter(s => s !== slug);
+    await get().updateSettings({ products, visibleProducts });
   }
 }));
