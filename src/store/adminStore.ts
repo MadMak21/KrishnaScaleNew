@@ -90,17 +90,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   },
 
   loadSettings: async () => {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    // 1. If keys are missing or placeholders, fallback immediately to local/defaults
-    if (!supabaseUrl || !anonKey || supabaseUrl === "PLACEHOLDER_URL" || anonKey === "PLACEHOLDER_ANON_KEY") {
-      console.warn("Supabase credentials not found. Using default settings.");
-      set({ settings: DEFAULT_SETTINGS, isLoaded: true });
-      return;
-    }
-
-    // 2. Fetch from Supabase
+    // Fetch from Supabase directly since supabase.ts handles credentials
     try {
       const { data, error } = await supabase
         .from('settings')
@@ -115,12 +105,11 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       if (data && data.data) {
         set({ settings: { ...DEFAULT_SETTINGS, ...data.data }, isLoaded: true });
       } else {
-        // If document doesn't exist yet, we will just use defaults
         set({ settings: DEFAULT_SETTINGS, isLoaded: true });
       }
     } catch (error) {
       console.error("Error fetching settings from Supabase:", error);
-      // Strictly use Supabase to prevent caching issues, fallback to defaults on error
+      // Fallback to defaults on error
       set({ settings: DEFAULT_SETTINGS, isLoaded: true });
     }
   },
@@ -132,21 +121,14 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     // Optimistic local update
     set({ settings: updated });
 
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    // Only attempt Supabase sync if keys are present
-    if (supabaseUrl && anonKey && supabaseUrl !== "PLACEHOLDER_URL" && anonKey !== "PLACEHOLDER_ANON_KEY") {
-      try {
-        const { error } = await supabase
-          .from('settings')
-          .upsert({ id: 'krishna-scale-admin', data: updated });
-          
-        if (error) throw error;
-      } catch (error) {
-        console.error("Error saving settings to Supabase:", error);
-        // Error is logged, but local state remains updated (optimistic)
-      }
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .upsert({ id: 'krishna-scale-admin', data: updated });
+        
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error saving settings to Supabase:", error);
     }
   },
 
