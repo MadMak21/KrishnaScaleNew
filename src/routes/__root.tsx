@@ -83,27 +83,35 @@ function RootComponent() {
 
   useEffect(() => {
     loadSettings();
-    // Enforce minimum 3s loading time to ensure the custom GIF shows at least 1 full rotation
-    const timer = setTimeout(() => setMinLoadFinished(true), 3000);
+    // 2000ms ensures the GIF plays exactly once (or close to it)
+    const timer = setTimeout(() => setMinLoadFinished(true), 2000);
     return () => clearTimeout(timer);
   }, [loadSettings]);
 
-  if (!isLoaded || !minLoadFinished) {
-    return (
-      <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center pb-12 sm:pb-0">
-        <div className="flex flex-col items-center justify-center -translate-y-12">
-          <img src="/loader.gif" alt="Loading..." className="w-80 h-80 sm:w-96 sm:h-96 object-contain" />
-          <div className="-mt-16 sm:-mt-20 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
-        </div>
-      </div>
-    );
-  }
+  const showLoader = !isLoaded || !minLoadFinished;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      {/* 
+        We always render the Outlet so that the website's images and 
+        components can load in the background while the GIF plays! 
+      */}
+      <div className={showLoader ? 'h-screen overflow-hidden' : ''}>
+        <Outlet />
+      </div>
+      
       <WhatsAppFloatingButton />
       <InquiryModal />
+
+      {/* Foreground Loader */}
+      {showLoader && (
+        <div className="fixed inset-0 z-[99999] bg-[#020817] flex flex-col items-center justify-center pb-12 sm:pb-0">
+          <div className="flex flex-col items-center justify-center -translate-y-12">
+            <img src="/loader.gif" alt="Loading..." className="w-80 h-80 sm:w-96 sm:h-96 object-contain" />
+            <div className="-mt-16 sm:-mt-20 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
+          </div>
+        </div>
+      )}
     </QueryClientProvider>
   );
 }
