@@ -67,6 +67,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+import { useEffect } from "react";
+import { useAdminStore } from "@/store/adminStore";
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -75,6 +78,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { loadSettings, isLoaded } = useAdminStore();
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="mt-4 text-orange-500 tracking-widest font-bold text-xs uppercase">Loading KRISHNA SCALE...</div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

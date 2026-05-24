@@ -99,18 +99,18 @@ function Index() {
       <section className="relative bg-waves text-foreground min-h-[100vh] overflow-hidden">
         <SiteHeader />
 
-        <div className="relative pt-20 md:pt-28 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
+        <div className="relative pt-12 md:pt-16 pb-8 md:pb-16 px-6 md:px-10 max-w-7xl mx-auto">
           
-          <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center mt-2 md:mt-10">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
             {/* Left side: Tilted product image */}
             <div 
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="relative mx-auto max-w-lg w-full flex items-center justify-center p-0 md:p-10 order-1 md:order-1" 
+              className="relative mx-auto max-w-lg w-full flex items-center justify-center p-0 md:p-8 order-1 md:order-1" 
             >
               <div className="glow-halo" />
-              <div className="hero-card relative p-6 md:p-10 w-full h-[280px] xs:h-[320px] sm:h-[360px] md:h-[500px] flex items-center justify-center">
+              <div className="hero-card relative p-6 md:p-10 w-full h-[320px] xs:h-[360px] sm:h-[400px] md:h-[550px] flex items-center justify-center">
                 <img
                   key={rawProduct.slug}
                   src={rawProduct.img}
@@ -354,7 +354,7 @@ function Index() {
       </section>
 
       {/* LOCATION & MAP SECTION */}
-      <section className="relative w-full h-[500px] md:h-[600px] bg-[#020817] border-t border-white/5 overflow-hidden flex items-center justify-center">
+      <section id="location" className="relative w-full h-[500px] md:h-[600px] bg-[#020817] border-t border-white/5 overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <iframe 
             src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117506.07447470691!2d72.49392231264421!3d23.02049776997034!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1s${i18n.language}!2sin!4v1716382103429!5m2!1s${i18n.language}!2sin`} 

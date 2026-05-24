@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { products as defaultProducts, categories as defaultCategories } from '@/lib/data';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 /* ── Types ── */
 
@@ -61,6 +62,8 @@ export interface AdminSettings {
 
 interface AdminStore {
   settings: AdminSettings;
+  isLoaded: boolean;               // tracks if initial load from Firebase is done
+  loadSettings: () => Promise<void>;
   updateSettings: (newSettings: Partial<AdminSettings>) => void;
   updateExploreConfig: (slug: string, config: Partial<ExploreConfig>) => void;
   updateProduct: (slug: string, updates: Partial<ProductData>) => void;
@@ -112,162 +115,174 @@ const defaultSettings: AdminSettings = {
   },
 };
 
+/* ── Helper to sync state to Firebase ── */
+const syncToFirebase = async (settings: AdminSettings) => {
+  try {
+    const docRef = doc(db, 'config', 'settings');
+    await setDoc(docRef, settings, { merge: true });
+  } catch (error) {
+    console.error("Failed to sync to Firebase. Ensure keys are valid.", error);
+  }
+};
+
 /* ── Store ── */
 
-export const useAdminStore = create<AdminStore>()(
-  persist(
-    (set) => ({
-      settings: defaultSettings,
+export const useAdminStore = create<AdminStore>()((set, get) => ({
+  settings: defaultSettings,
+  isLoaded: false,
 
-      updateSettings: (newSettings) =>
-        set((state) => ({ settings: { ...state.settings, ...newSettings } })),
-
-      updateExploreConfig: (slug, config) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            exploreConfig: {
-              ...state.settings.exploreConfig,
-              [slug]: {
-                ...(state.settings.exploreConfig[slug] || { relatedProducts: [], galleryImagesCount: 4 }),
-                ...config,
-              },
+  loadSettings: async () => {
+    try {
+      const docRef = doc(db, 'config', 'settings');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data() as Partial<AdminSettings>;
+        
+        // Merge fetched data with defaults
+        const currentProducts = data.products && data.products.length > 0 ? data.products : defaultSettings.products;
+        
+        // Deep merge products to ensure no missing keys
+        const mergedProducts = currentProducts.map(p => {
+          const defaultP = defaultSettings.products.find(dp => dp.slug === p.slug || dp.id === p.id);
+          if (!defaultP) return p;
+          return {
+            ...defaultP,
+            ...p,
+            translations: {
+              en: { ...defaultP.translations.en, ...(p.translations?.en || {}) },
+              hi: { ...defaultP.translations.hi, ...(p.translations?.hi || {}) },
+              gu: { ...defaultP.translations.gu, ...(p.translations?.gu || {}) },
             },
-          },
-        })),
+            specs: { ...defaultP.specs, ...(p.specs || {}) }
+          };
+        });
 
-      updateProduct: (slug, updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            products: state.settings.products.map(p =>
-              p.slug === slug ? { ...p, ...updates } : p
-            ),
-          },
-        })),
-
-      updateProductTranslation: (slug, lang, updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            products: state.settings.products.map(p =>
-              p.slug === slug
-                ? { ...p, translations: { ...p.translations, [lang]: { ...p.translations[lang], ...updates } } }
-                : p
-            ),
-          },
-        })),
-
-      updateProductSpecs: (slug, updates) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            products: state.settings.products.map(p =>
-              p.slug === slug ? { ...p, specs: { ...p.specs, ...updates } } : p
-            ),
-          },
-        })),
-
-      updateProductGallery: (slug, gallery) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            products: state.settings.products.map(p =>
-              p.slug === slug ? { ...p, gallery } : p
-            ),
-          },
-        })),
-
-      addProduct: (product) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            products: [...state.settings.products, product],
-            visibleProducts: [...state.settings.visibleProducts, product.slug],
-          },
-        })),
-
-      removeProduct: (slug) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            products: state.settings.products.filter(p => p.slug !== slug),
-            visibleProducts: state.settings.visibleProducts.filter(s => s !== slug),
-          },
-        })),
-
-      updateContactInfo: (info) =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            contactInfo: { ...state.settings.contactInfo, ...info },
-          },
-        })),
-
-      isLoggedIn: false,
-      login: () => set({ isLoggedIn: true }),
-      logout: () => set({ isLoggedIn: false }),
-      isInquiryOpen: false,
-      inquiryProductSlug: null,
-      openInquiry: (slug = null) => set({ isInquiryOpen: true, inquiryProductSlug: slug }),
-      closeInquiry: () => set({ isInquiryOpen: false, inquiryProductSlug: null }),
-    }),
-    {
-      name: 'admin-storage',
-      merge: (persistedState: any, currentState: any) => {
-        if (!persistedState) return currentState;
-        const persisted = persistedState as any;
-        const current = currentState as any;
-        return {
-          ...current,
-          ...persisted,
-          settings: {
-            ...current.settings,
-            ...(persisted.settings || {}),
-            contactInfo: {
-              ...current.settings.contactInfo,
-              ...(persisted.settings?.contactInfo || {}),
-            },
-            exploreConfig: {
-              ...current.settings.exploreConfig,
-              ...(persisted.settings?.exploreConfig || {}),
-            },
-            bannerSlides: persisted.settings?.bannerSlides || current.settings.bannerSlides,
-            products: persisted.settings?.products && persisted.settings.products.length > 0
-              ? persisted.settings.products.map((p: any) => {
-                  const defaultP = current.settings.products.find((dp: any) => dp.slug === p.slug || dp.id === p.id);
-                  if (!defaultP) return p;
-                  return {
-                    ...defaultP,
-                    ...p,
-                    translations: {
-                      en: {
-                        sub: defaultP.translations.en.sub || '',
-                        description: defaultP.translations.en.description || '',
-                        ...defaultP.translations.en,
-                        ...(p.translations?.en || {})
-                      },
-                      hi: {
-                        sub: defaultP.translations.hi.sub || '',
-                        description: defaultP.translations.hi.description || '',
-                        ...defaultP.translations.hi,
-                        ...(p.translations?.hi || {})
-                      },
-                      gu: {
-                        sub: defaultP.translations.gu.sub || '',
-                        description: defaultP.translations.gu.description || '',
-                        ...defaultP.translations.gu,
-                        ...(p.translations?.gu || {})
-                      },
-                    },
-                    specs: { ...defaultP.specs, ...(p.specs || {}) }
-                  };
-                })
-              : current.settings.products,
-            visibleProducts: persisted.settings?.visibleProducts || current.settings.visibleProducts,
-          }
+        const mergedSettings: AdminSettings = {
+          ...defaultSettings,
+          ...data,
+          products: mergedProducts,
+          contactInfo: { ...defaultSettings.contactInfo, ...(data.contactInfo || {}) },
+          exploreConfig: { ...defaultSettings.exploreConfig, ...(data.exploreConfig || {}) },
+          bannerSlides: data.bannerSlides || defaultSettings.bannerSlides,
+          visibleProducts: data.visibleProducts || defaultSettings.visibleProducts,
         };
+
+        set({ settings: mergedSettings, isLoaded: true });
+      } else {
+        // Doc doesn't exist, use defaults and save them
+        set({ isLoaded: true });
+        await syncToFirebase(defaultSettings);
       }
+    } catch (error) {
+      console.warn("Firebase fetch failed. Using defaults.", error);
+      set({ isLoaded: true });
     }
-  )
-);
+  },
+
+  updateSettings: (newSettings) => {
+    const s = get().settings;
+    const updated = { ...s, ...newSettings };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  updateExploreConfig: (slug, config) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      exploreConfig: {
+        ...s.exploreConfig,
+        [slug]: {
+          ...(s.exploreConfig[slug] || { relatedProducts: [], galleryImagesCount: 4 }),
+          ...config,
+        },
+      },
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  updateProduct: (slug, updates) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      products: s.products.map(p => (p.slug === slug ? { ...p, ...updates } : p)),
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  updateProductTranslation: (slug, lang, updates) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      products: s.products.map(p =>
+        p.slug === slug
+          ? { ...p, translations: { ...p.translations, [lang]: { ...p.translations[lang], ...updates } } }
+          : p
+      ),
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  updateProductSpecs: (slug, updates) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      products: s.products.map(p => (p.slug === slug ? { ...p, specs: { ...p.specs, ...updates } } : p)),
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  updateProductGallery: (slug, gallery) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      products: s.products.map(p => (p.slug === slug ? { ...p, gallery } : p)),
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  addProduct: (product) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      products: [...s.products, product],
+      visibleProducts: [...s.visibleProducts, product.slug],
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  removeProduct: (slug) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      products: s.products.filter(p => p.slug !== slug),
+      visibleProducts: s.visibleProducts.filter(id => id !== slug),
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  updateContactInfo: (info) => {
+    const s = get().settings;
+    const updated = {
+      ...s,
+      contactInfo: { ...s.contactInfo, ...info },
+    };
+    set({ settings: updated });
+    syncToFirebase(updated);
+  },
+
+  isLoggedIn: false,
+  login: () => set({ isLoggedIn: true }),
+  logout: () => set({ isLoggedIn: false }),
+  isInquiryOpen: false,
+  inquiryProductSlug: null,
+  openInquiry: (slug = null) => set({ isInquiryOpen: true, inquiryProductSlug: slug }),
+  closeInquiry: () => set({ isInquiryOpen: false, inquiryProductSlug: null }),
+}));
