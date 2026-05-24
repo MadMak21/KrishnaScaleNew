@@ -87,8 +87,8 @@ function RootComponent() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        <div className="mt-4 text-orange-500 tracking-widest font-bold text-xs uppercase">Loading KRISHNA SCALE...</div>
+        <img src="/loader.gif" alt="Loading..." className="w-48 h-48 object-contain mb-4" />
+        <div className="mt-4 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
       </div>
     );
   }

@@ -73,7 +73,7 @@ export function SiteHeader() {
 
         {/* Desktop Language Switcher (Right) */}
         <div className="hidden md:flex w-1/4 justify-end items-center gap-2 z-50">
-          <button onClick={() => i18n.changeLanguage('en')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'en' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>EN</button>
+          <button onClick={() => i18n.changeLanguage('en')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'en' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>ENGLISH</button>
           <button onClick={() => i18n.changeLanguage('hi')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'hi' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>हिन्दी</button>
           <button onClick={() => i18n.changeLanguage('gu')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'gu' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>ગુજરાતી</button>
         </div>
@@ -85,7 +85,7 @@ export function SiteHeader() {
         {showTutorial && !menuOpen && (
           <div className="absolute right-full mr-2 flex items-center gap-2 animate-pulse pointer-events-none w-max">
             <div className="bg-orange-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-md shadow-lg tracking-widest uppercase">
-              Click to open menu
+              CLICK HERE TO OPEN MENU
             </div>
             <div className="text-2xl">👉</div>
           </div>
@@ -134,7 +134,7 @@ export function SiteHeader() {
           <div className="flex flex-col gap-4">
             <span className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase font-bold">{t("Language")}</span>
             <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-xl border border-white/10 w-full justify-between">
-              <button onClick={() => { i18n.changeLanguage('en'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'en' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>EN</button>
+              <button onClick={() => { i18n.changeLanguage('en'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'en' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>ENGLISH</button>
               <button onClick={() => { i18n.changeLanguage('hi'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'hi' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>हिन्दी</button>
               <button onClick={() => { i18n.changeLanguage('gu'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'gu' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>ગુજરાતી</button>
             </div>
