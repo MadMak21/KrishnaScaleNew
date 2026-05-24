@@ -68,9 +68,10 @@ const DEFAULT_SETTINGS: Settings = {
 
 // A fallback to local storage if DB is not reachable
 const LOCAL_STORAGE_KEY = 'krishna_admin_settings';
+const AUTH_STORAGE_KEY = 'krishna_admin_auth';
 
 export const useAdminStore = create<AdminStore>((set, get) => ({
-  isAuthenticated: false,
+  isAuthenticated: localStorage.getItem(AUTH_STORAGE_KEY) === 'true',
   isLoaded: false,
   settings: DEFAULT_SETTINGS,
   inquiryModalOpen: false,
@@ -78,9 +79,15 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   openInquiry: () => set({ inquiryModalOpen: true }),
   closeInquiry: () => set({ inquiryModalOpen: false }),
 
-  login: () => set({ isAuthenticated: true }),
+  login: () => {
+    localStorage.setItem(AUTH_STORAGE_KEY, 'true');
+    set({ isAuthenticated: true });
+  },
   
-  logout: () => set({ isAuthenticated: false }),
+  logout: () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    set({ isAuthenticated: false });
+  },
 
   loadSettings: async () => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -88,16 +95,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     
     // 1. If keys are missing or placeholders, fallback immediately to local/defaults
     if (!supabaseUrl || !anonKey || supabaseUrl === "PLACEHOLDER_URL" || anonKey === "PLACEHOLDER_ANON_KEY") {
-      console.warn("Supabase credentials not found. Using local/default settings.");
-      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (local) {
-        try {
-          set({ settings: { ...DEFAULT_SETTINGS, ...JSON.parse(local) }, isLoaded: true });
-          return;
-        } catch (e) {
-          console.error("Local storage parsing error", e);
-        }
-      }
+      console.warn("Supabase credentials not found. Using default settings.");
       set({ settings: DEFAULT_SETTINGS, isLoaded: true });
       return;
     }
@@ -116,22 +114,13 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       if (data && data.data) {
         set({ settings: { ...DEFAULT_SETTINGS, ...data.data }, isLoaded: true });
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data.data)); // Backup locally
       } else {
         // If document doesn't exist yet, we will just use defaults
         set({ settings: DEFAULT_SETTINGS, isLoaded: true });
       }
     } catch (error) {
       console.error("Error fetching settings from Supabase:", error);
-      
-      // Fallback to local storage on network error
-      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (local) {
-        try {
-          set({ settings: { ...DEFAULT_SETTINGS, ...JSON.parse(local) }, isLoaded: true });
-          return;
-        } catch (e) { /* ignore */ }
-      }
+      // Strictly use Supabase to prevent caching issues, fallback to defaults on error
       set({ settings: DEFAULT_SETTINGS, isLoaded: true });
     }
   },
@@ -142,7 +131,6 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     
     // Optimistic local update
     set({ settings: updated });
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
