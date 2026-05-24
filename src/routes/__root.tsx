@@ -69,6 +69,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/store/adminStore";
+import { useTranslation } from "react-i18next";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: RootComponent,
@@ -80,6 +81,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { loadSettings, isLoaded } = useAdminStore();
   const [minLoadFinished, setMinLoadFinished] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadSettings();
@@ -108,7 +110,7 @@ function RootComponent() {
         <div className="fixed inset-0 z-[99999] bg-[#020817] flex flex-col items-center justify-center pb-12 sm:pb-0">
           <div className="flex flex-col items-center justify-center -translate-y-12">
             <img src="/loader.gif" alt="Loading..." className="w-80 h-80 sm:w-96 sm:h-96 object-contain" />
-            <div className="-mt-16 sm:-mt-20 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
+            <div className="-mt-16 sm:-mt-20 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">{t("Loading KRISHNA SCALE...")}</div>
           </div>
         </div>
       )}

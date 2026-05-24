@@ -72,7 +72,8 @@ const resources = {
       "Government Approved": "Government Approved",
       "Fully licensed scale manufacturers with authorized stamping & calibration services.": "Fully licensed scale manufacturers with authorized stamping & calibration services.",
       "Trusted Partner": "Trusted Partner",
-      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat."
+      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.",
+      "Loading KRISHNA SCALE...": "Loading KRISHNA SCALE..."
     }
   },
   hi: {
@@ -145,7 +146,8 @@ const resources = {
       "Government Approved": "सरकार द्वारा अनुमोदित",
       "Fully licensed scale manufacturers with authorized stamping & calibration services.": "अधिकृत स्टैम्पिंग और अंशांकन सेवाओं के साथ पूरी तरह से लाइसेंस प्राप्त स्केल निर्माता।",
       "Trusted Partner": "विश्वसनीय भागीदार",
-      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "पूरे गुजरात में 5000+ से अधिक संतुष्ट वाणिज्यिक और औद्योगिक सेटअप की सेवा।"
+      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "पूरे गुजरात में 5000+ से अधिक संतुष्ट वाणिज्यिक और औद्योगिक सेटअप की सेवा।",
+      "Loading KRISHNA SCALE...": "कृष्णा स्केल लोड हो रहा है..."
     }
   },
   gu: {
@@ -218,20 +220,27 @@ const resources = {
       "Government Approved": "સરકાર દ્વારા માન્ય",
       "Fully licensed scale manufacturers with authorized stamping & calibration services.": "અધિકૃત સ્ટેમ્પિંગ અને કેલિબ્રેશન સેવાઓ સાથે સંપૂર્ણ લાયસન્સ પ્રાપ્ત સ્કેલ ઉત્પાદકો.",
       "Trusted Partner": "વિશ્વસનીય ભાગીદાર",
-      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "સમગ્ર ગુજરાતમાં 5000+ થી વધુ સંતુષ્ટ વ્યાપારી અને ઔદ્યોગિક સેટઅપની સેવા."
+      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "સમગ્ર ગુજરાતમાં 5000+ થી વધુ સંતુષ્ટ વ્યાપારી અને ઔદ્યોગિક સેટઅપની સેવા.",
+      "Loading KRISHNA SCALE...": "કૃષ્ણા સ્કેલ લોડ થઈ રહ્યું છે..."
     }
   }
 };
+
+const savedLanguage = localStorage.getItem('krishna_language') || 'en';
 
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "en",
+    lng: savedLanguage,
     fallbackLng: "en",
     interpolation: {
       escapeValue: false 
     }
   });
+
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('krishna_language', lng);
+});
 
 export default i18n;
