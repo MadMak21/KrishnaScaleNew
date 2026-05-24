@@ -21,7 +21,7 @@ function fileToBase64(file: File): Promise<string> {
 
 function AdminPage() {
   const {
-    isLoggedIn, login, logout, settings,
+    isAuthenticated, login, logout, settings,
     updateSettings, updateExploreConfig,
     updateProduct, updateProductTranslation, updateProductSpecs,
     updateProductGallery, updateContactInfo, addProduct, removeProduct,
@@ -48,7 +48,7 @@ function AdminPage() {
     }
   };
 
-  if (!isLoggedIn) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-4">
         <form onSubmit={handleLogin} className="bg-black/50 p-8 rounded-2xl border border-white/10 w-full max-w-md space-y-6">
