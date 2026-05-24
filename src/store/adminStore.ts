@@ -1,295 +1,157 @@
 import { create } from 'zustand';
 import { products as defaultProducts, categories as defaultCategories } from '@/lib/data';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 /* ── Types ── */
-
-export interface ProductTranslation {
-  name: string;
-  tag: string;
-  sub: string;
-  description: string;
-  features: string[];
-  capacity: string;
-}
-
-export interface ProductSpecs {
-  accuracy: string;
-  material: string;
-  displayType: string;
-  batteryBackup: string;
-  warranty: string;
-}
-
-export interface ProductData {
-  id: string;
-  slug: string;
-  img: string;                     // main image (import path or base64)
-  gallery: string[];               // multiple gallery images
-  translations: {
-    en: ProductTranslation;
-    hi: ProductTranslation;
-    gu: ProductTranslation;
-  };
-  specs: ProductSpecs;
-}
-
-export interface BannerSlide {
-  id: string;
-  image: string;
-  text: string;
-}
 
 export interface ContactInfo {
   whatsappNumber: string;
   inquiryEmail: string;
-  phoneDisplay: string;            // display format like "+91 90336 21801"
+  phoneDisplay: string;
 }
 
-export interface ExploreConfig {
-  relatedProducts: string[];
-  galleryImagesCount: number;
-}
-
-export interface AdminSettings {
-  bannerSlides: BannerSlide[];
-  visibleProducts: string[];
-  exploreConfig: Record<string, ExploreConfig>;
-  products: ProductData[];
+export interface Settings {
+  siteTitle: string;
+  heroText: string;
   contactInfo: ContactInfo;
+  products: typeof defaultProducts;
+  categories: typeof defaultCategories;
+  visibleProducts: string[];
+  bannerSlides: { image?: string; text: string }[];
 }
 
-interface AdminStore {
-  settings: AdminSettings;
-  isLoaded: boolean;               // tracks if initial load from Firebase is done
-  loadSettings: () => Promise<void>;
-  updateSettings: (newSettings: Partial<AdminSettings>) => void;
-  updateExploreConfig: (slug: string, config: Partial<ExploreConfig>) => void;
-  updateProduct: (slug: string, updates: Partial<ProductData>) => void;
-  updateProductTranslation: (slug: string, lang: 'en' | 'hi' | 'gu', updates: Partial<ProductTranslation>) => void;
-  updateProductSpecs: (slug: string, updates: Partial<ProductSpecs>) => void;
-  updateProductGallery: (slug: string, gallery: string[]) => void;
-  addProduct: (product: ProductData) => void;
-  removeProduct: (slug: string) => void;
-  updateContactInfo: (info: Partial<ContactInfo>) => void;
-  isLoggedIn: boolean;
-  login: () => void;
+export interface AdminStore {
+  isAuthenticated: boolean;
+  isLoaded: boolean;
+  settings: Settings;
+  login: (password: string) => boolean;
   logout: () => void;
-  isInquiryOpen: boolean;
-  inquiryProductSlug: string | null;
-  openInquiry: (slug?: string | null) => void;
+  updateSettings: (newSettings: Partial<Settings>) => Promise<void>;
+  loadSettings: () => Promise<void>;
+  
+  inquiryModalOpen: boolean;
+  openInquiry: () => void;
   closeInquiry: () => void;
 }
 
-/* ── Defaults from data.ts ── */
-
-const defaultProductsData: ProductData[] = defaultProducts.map(p => ({
-  id: p.id,
-  slug: p.slug,
-  img: p.img,
-  gallery: p.gallery || [p.img],
-  translations: p.translations,
-  specs: {
-    accuracy: 'Standard Class III / Heavy Duty',
-    material: 'MS / SS (Industrial Grade)',
-    displayType: 'High Brightness Red/Green LED',
-    batteryBackup: 'Up to 48 Hours In-built',
-    warranty: '1 Year Manufacturer Warranty',
-  },
-}));
-
-const defaultSettings: AdminSettings = {
-  bannerSlides: defaultCategories.map((c, i) => ({
-    id: `slide-${i}`,
-    image: defaultProducts[i % defaultProducts.length].img,
-    text: c,
-  })),
-  visibleProducts: defaultProducts.map(p => p.slug),
-  exploreConfig: {},
-  products: defaultProductsData,
+const DEFAULT_SETTINGS: Settings = {
+  siteTitle: "Krishna Scale",
+  heroText: "Precision Industrial Weighing Solutions",
   contactInfo: {
-    whatsappNumber: '919033621801',
-    inquiryEmail: 'sales@krishnascale.in',
-    phoneDisplay: '+91 90336 21801',
+    whatsappNumber: "919033621801",
+    inquiryEmail: "sales@krishnascale.in",
+    phoneDisplay: "+91 90336 21801"
   },
+  products: defaultProducts,
+  categories: defaultCategories,
+  visibleProducts: defaultProducts.map(p => p.slug),
+  bannerSlides: [
+    { text: "HEAVY DUTY PLATFORMS" },
+    { text: "PRECISION CALIBRATION" },
+    { text: "INDUSTRIAL GRADE" },
+    { text: "100% ACCURACY ASSURED" }
+  ]
 };
 
-/* ── Helper to sync state to Firebase ── */
-const syncToFirebase = async (settings: AdminSettings) => {
-  try {
-    const docRef = doc(db, 'config', 'settings');
-    await setDoc(docRef, settings, { merge: true });
-  } catch (error) {
-    console.error("Failed to sync to Firebase. Ensure keys are valid.", error);
-  }
-};
+// A fallback to local storage if DB is not reachable
+const LOCAL_STORAGE_KEY = 'krishna_admin_settings';
 
-/* ── Store ── */
-
-export const useAdminStore = create<AdminStore>()((set, get) => ({
-  settings: defaultSettings,
+export const useAdminStore = create<AdminStore>((set, get) => ({
+  isAuthenticated: false,
   isLoaded: false,
+  settings: DEFAULT_SETTINGS,
+  inquiryModalOpen: false,
+
+  openInquiry: () => set({ inquiryModalOpen: true }),
+  closeInquiry: () => set({ inquiryModalOpen: false }),
+
+  login: (password: string) => {
+    if (password === 'admin123') { // Replace with strong auth in production
+      set({ isAuthenticated: true });
+      return true;
+    }
+    return false;
+  },
+  
+  logout: () => set({ isAuthenticated: false }),
 
   loadSettings: async () => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    // 1. If keys are missing or placeholders, fallback immediately to local/defaults
+    if (!supabaseUrl || !anonKey || supabaseUrl === "PLACEHOLDER_URL" || anonKey === "PLACEHOLDER_ANON_KEY") {
+      console.warn("Supabase credentials not found. Using local/default settings.");
+      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (local) {
+        try {
+          set({ settings: { ...DEFAULT_SETTINGS, ...JSON.parse(local) }, isLoaded: true });
+          return;
+        } catch (e) {
+          console.error("Local storage parsing error", e);
+        }
+      }
+      set({ settings: DEFAULT_SETTINGS, isLoaded: true });
+      return;
+    }
+
+    // 2. Fetch from Supabase
     try {
-      // Skip Firebase if we are using the placeholder API key
-      if (import.meta.env.VITE_FIREBASE_API_KEY === undefined || import.meta.env.VITE_FIREBASE_API_KEY === "PLACEHOLDER_API_KEY") {
-        console.log("Using local default settings (Firebase not configured)");
-        set({ settings: defaultSettings, isLoaded: true });
-        return;
+      const { data, error } = await supabase
+        .from('settings')
+        .select('data')
+        .eq('id', 'krishna-scale-admin')
+        .single();
+        
+      if (error) {
+        throw error;
       }
 
-      const docRef = doc(db, 'config', 'settings');
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data() as Partial<AdminSettings>;
-        
-        // Merge fetched data with defaults
-        const currentProducts = data.products && data.products.length > 0 ? data.products : defaultSettings.products;
-        
-        // Deep merge products to ensure no missing keys
-        const mergedProducts = currentProducts.map(p => {
-          const defaultP = defaultSettings.products.find(dp => dp.slug === p.slug || dp.id === p.id);
-          if (!defaultP) return p;
-          return {
-            ...defaultP,
-            ...p,
-            translations: {
-              en: { ...defaultP.translations.en, ...(p.translations?.en || {}) },
-              hi: { ...defaultP.translations.hi, ...(p.translations?.hi || {}) },
-              gu: { ...defaultP.translations.gu, ...(p.translations?.gu || {}) },
-            },
-            specs: { ...defaultP.specs, ...(p.specs || {}) }
-          };
-        });
-
-        const mergedSettings: AdminSettings = {
-          ...defaultSettings,
-          ...data,
-          products: mergedProducts,
-          contactInfo: { ...defaultSettings.contactInfo, ...(data.contactInfo || {}) },
-          exploreConfig: { ...defaultSettings.exploreConfig, ...(data.exploreConfig || {}) },
-          bannerSlides: data.bannerSlides || defaultSettings.bannerSlides,
-          visibleProducts: data.visibleProducts || defaultSettings.visibleProducts,
-        };
-
-        set({ settings: mergedSettings, isLoaded: true });
+      if (data && data.data) {
+        set({ settings: { ...DEFAULT_SETTINGS, ...data.data }, isLoaded: true });
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data.data)); // Backup locally
       } else {
-        // Doc doesn't exist, use defaults and save them
-        set({ isLoaded: true });
-        await syncToFirebase(defaultSettings);
+        // If document doesn't exist yet, we will just use defaults
+        set({ settings: DEFAULT_SETTINGS, isLoaded: true });
       }
     } catch (error) {
-      console.warn("Firebase fetch failed. Using defaults.", error);
-      set({ isLoaded: true });
+      console.error("Error fetching settings from Supabase:", error);
+      
+      // Fallback to local storage on network error
+      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (local) {
+        try {
+          set({ settings: { ...DEFAULT_SETTINGS, ...JSON.parse(local) }, isLoaded: true });
+          return;
+        } catch (e) { /* ignore */ }
+      }
+      set({ settings: DEFAULT_SETTINGS, isLoaded: true });
     }
   },
 
-  updateSettings: (newSettings) => {
-    const s = get().settings;
-    const updated = { ...s, ...newSettings };
+  updateSettings: async (newSettings: Partial<Settings>) => {
+    const current = get().settings;
+    const updated = { ...current, ...newSettings };
+    
+    // Optimistic local update
     set({ settings: updated });
-    syncToFirebase(updated);
-  },
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
 
-  updateExploreConfig: (slug, config) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      exploreConfig: {
-        ...s.exploreConfig,
-        [slug]: {
-          ...(s.exploreConfig[slug] || { relatedProducts: [], galleryImagesCount: 4 }),
-          ...config,
-        },
-      },
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  updateProduct: (slug, updates) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      products: s.products.map(p => (p.slug === slug ? { ...p, ...updates } : p)),
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  updateProductTranslation: (slug, lang, updates) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      products: s.products.map(p =>
-        p.slug === slug
-          ? { ...p, translations: { ...p.translations, [lang]: { ...p.translations[lang], ...updates } } }
-          : p
-      ),
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  updateProductSpecs: (slug, updates) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      products: s.products.map(p => (p.slug === slug ? { ...p, specs: { ...p.specs, ...updates } } : p)),
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  updateProductGallery: (slug, gallery) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      products: s.products.map(p => (p.slug === slug ? { ...p, gallery } : p)),
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  addProduct: (product) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      products: [...s.products, product],
-      visibleProducts: [...s.visibleProducts, product.slug],
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  removeProduct: (slug) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      products: s.products.filter(p => p.slug !== slug),
-      visibleProducts: s.visibleProducts.filter(id => id !== slug),
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  updateContactInfo: (info) => {
-    const s = get().settings;
-    const updated = {
-      ...s,
-      contactInfo: { ...s.contactInfo, ...info },
-    };
-    set({ settings: updated });
-    syncToFirebase(updated);
-  },
-
-  isLoggedIn: false,
-  login: () => set({ isLoggedIn: true }),
-  logout: () => set({ isLoggedIn: false }),
-  isInquiryOpen: false,
-  inquiryProductSlug: null,
-  openInquiry: (slug = null) => set({ isInquiryOpen: true, inquiryProductSlug: slug }),
-  closeInquiry: () => set({ isInquiryOpen: false, inquiryProductSlug: null }),
+    // Only attempt Supabase sync if keys are present
+    if (supabaseUrl && anonKey && supabaseUrl !== "PLACEHOLDER_URL" && anonKey !== "PLACEHOLDER_ANON_KEY") {
+      try {
+        const { error } = await supabase
+          .from('settings')
+          .upsert({ id: 'krishna-scale-admin', data: updated });
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error saving settings to Supabase:", error);
+        // Error is logged, but local state remains updated (optimistic)
+      }
+    }
+  }
 }));
