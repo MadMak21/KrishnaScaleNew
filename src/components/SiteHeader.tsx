@@ -80,7 +80,12 @@ export function SiteHeader() {
       </header>
 
       {/* Mobile Sticky Arrow Button & Tutorial (Hidden on Desktop) */}
-      <div className="fixed right-0 top-[25%] -translate-y-1/2 z-50 md:hidden flex items-center">
+      <div 
+        className={`fixed right-0 z-[100] transition-all duration-300 md:hidden ${
+          (isScrolling || showTutorial) ? 'opacity-100' : 'opacity-40 hover:opacity-100'
+        }`}
+        style={{ top: '25%' }}
+      >
         {/* Tutorial Pointing Hand */}
         {showTutorial && !menuOpen && (
           <div className="absolute right-full mr-2 flex items-center gap-2 animate-pulse pointer-events-none w-max">

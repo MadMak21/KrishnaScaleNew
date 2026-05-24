@@ -90,9 +90,11 @@ function RootComponent() {
 
   if (!isLoaded || !minLoadFinished) {
     return (
-      <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center pb-24 sm:pb-0">
-        <img src="/loader.gif" alt="Loading..." className="w-80 h-80 sm:w-96 sm:h-96 object-contain" />
-        <div className="-mt-12 sm:-mt-16 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
+      <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center pb-12 sm:pb-0">
+        <div className="flex flex-col items-center justify-center -translate-y-12">
+          <img src="/loader.gif" alt="Loading..." className="w-80 h-80 sm:w-96 sm:h-96 object-contain" />
+          <div className="-mt-16 sm:-mt-20 text-orange-500 tracking-widest font-bold text-xs uppercase animate-pulse">Loading KRISHNA SCALE...</div>
+        </div>
       </div>
     );
   }

@@ -187,7 +187,7 @@ function AdminPage() {
           <h2 className="text-2xl font-bold mb-6 text-green-400">Explore Page (Details) Settings</h2>
           <div className="space-y-8">
             {storeProducts.map(p => {
-              const config = settings.exploreConfig[p.slug] || {
+              const config = (settings.exploreConfig && settings.exploreConfig[p.slug]) || {
                 relatedProducts: storeProducts.filter(r => r.slug !== p.slug).slice(0, 4).map(r => r.slug),
                 galleryImagesCount: 4,
               };

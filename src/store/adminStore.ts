@@ -18,6 +18,7 @@ export interface Settings {
   categories: typeof defaultCategories;
   visibleProducts: string[];
   bannerSlides: { image?: string; text: string }[];
+  exploreConfig: Record<string, { relatedProducts: string[], galleryImagesCount: number }>;
 }
 
 export interface AdminStore {
@@ -50,7 +51,8 @@ const DEFAULT_SETTINGS: Settings = {
     { text: "PRECISION CALIBRATION" },
     { text: "INDUSTRIAL GRADE" },
     { text: "100% ACCURACY ASSURED" }
-  ]
+  ],
+  exploreConfig: {}
 };
 
 // A fallback to local storage if DB is not reachable
