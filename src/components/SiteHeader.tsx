@@ -6,12 +6,22 @@ export function SiteHeader() {
   const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
     const tutorialSeen = localStorage.getItem("krishna_tutorial_seen");
     if (!tutorialSeen) {
       setShowTutorial(true);
     }
+    
+    let scrollTimeout: ReturnType<typeof setTimeout>;
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => setIsScrolling(false), 250);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleOpenMenu = () => {
@@ -37,13 +47,16 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-5 bg-transparent overflow-visible">
-        <Link to="/" className="text-white text-xs md:text-sm font-black tracking-[0.2em] px-2 py-1 uppercase z-50">
-          {t("KRISHNA SCALE")}
-        </Link>
+      <header className="absolute top-0 left-0 right-0 z-40 flex items-center px-6 md:px-10 py-5 bg-transparent overflow-visible">
+        {/* Left: Logo */}
+        <div className="w-1/2 md:w-1/4 flex items-center z-50">
+          <Link to="/" className="text-white text-[10px] md:text-sm font-black tracking-[0.2em] px-3 py-1.5 border border-white/20 uppercase rounded">
+            {t("KRISHNA SCALE")}
+          </Link>
+        </div>
         
-        {/* Desktop Navigation (Hidden on Mobile) */}
-        <div className="hidden md:flex items-center gap-8 z-50 bg-[#020817]/80 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
+        {/* Desktop Navigation (Middle) */}
+        <div className="hidden md:flex flex-1 justify-center items-center gap-8 z-50">
           <Link to="/" className="text-xs font-bold tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase">
             {t("HOME")}
           </Link>
@@ -56,26 +69,18 @@ export function SiteHeader() {
           <button onClick={() => scrollToSection('contact')} className="text-xs font-bold tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase cursor-pointer">
             {t("CONTACT US")}
           </button>
+        </div>
 
-          <div className="w-px h-4 bg-white/20 mx-2" />
-
-          {/* Desktop Language Switcher */}
-          <div className="flex items-center gap-2">
-            {(['en', 'hi', 'gu'] as const).map((lang) => (
-              <button 
-                key={lang}
-                onClick={() => i18n.changeLanguage(lang)}
-                className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === lang ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}
-              >
-                {lang}
-              </button>
-            ))}
-          </div>
+        {/* Desktop Language Switcher (Right) */}
+        <div className="hidden md:flex w-1/4 justify-end items-center gap-2 z-50">
+          <button onClick={() => i18n.changeLanguage('en')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'en' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>EN</button>
+          <button onClick={() => i18n.changeLanguage('hi')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'hi' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>हिन्दी</button>
+          <button onClick={() => i18n.changeLanguage('gu')} className={`text-[10px] font-bold tracking-widest uppercase transition-colors cursor-pointer px-2 py-1 rounded ${i18n.language === 'gu' ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'}`}>ગુજરાતી</button>
         </div>
       </header>
 
       {/* Mobile Sticky Arrow Button & Tutorial (Hidden on Desktop) */}
-      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 md:hidden flex items-center">
+      <div className="fixed right-0 top-[25%] -translate-y-1/2 z-50 md:hidden flex items-center">
         {/* Tutorial Pointing Hand */}
         {showTutorial && !menuOpen && (
           <div className="absolute right-full mr-2 flex items-center gap-2 animate-pulse pointer-events-none w-max">
@@ -88,16 +93,16 @@ export function SiteHeader() {
 
         <button 
           onClick={() => menuOpen ? setMenuOpen(false) : handleOpenMenu()}
-          className="text-white hover:text-orange-500 focus:outline-none p-3 pl-4 transition-all cursor-pointer bg-[#020817]/90 backdrop-blur-md border border-r-0 border-white/20 hover:bg-[#020817] shadow-[-5px_0_15px_rgba(0,0,0,0.5)] rounded-l-2xl"
+          className={`text-white hover:text-orange-500 focus:outline-none py-6 pl-3 pr-1 transition-all cursor-pointer backdrop-blur-md border border-r-0 border-white/20 hover:bg-[#020817]/90 shadow-[-5px_0_15px_rgba(0,0,0,0.5)] rounded-l-md flex items-center justify-center ${isScrolling ? 'bg-[#020817] opacity-80' : 'bg-[#020817]/50'}`}
           aria-label="Toggle menu"
         >
           {menuOpen ? (
-            <svg className="w-6 h-6 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-4 h-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-6 h-6 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            <svg className="w-4 h-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
             </svg>
           )}
         </button>
@@ -129,15 +134,9 @@ export function SiteHeader() {
           <div className="flex flex-col gap-4">
             <span className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase font-bold">{t("Language")}</span>
             <div className="flex items-center gap-1 bg-black/40 p-1.5 rounded-xl border border-white/10 w-full justify-between">
-              {(['en', 'hi', 'gu'] as const).map((lang) => (
-                <button 
-                  key={lang}
-                  onClick={() => { i18n.changeLanguage(lang); setMenuOpen(false); }}
-                  className={`flex-1 py-2 text-xs font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === lang ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
-                >
-                  {lang === 'en' ? 'EN' : lang === 'hi' ? 'HI' : 'GU'}
-                </button>
-              ))}
+              <button onClick={() => { i18n.changeLanguage('en'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'en' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>EN</button>
+              <button onClick={() => { i18n.changeLanguage('hi'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'hi' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>हिन्दी</button>
+              <button onClick={() => { i18n.changeLanguage('gu'); setMenuOpen(false); }} className={`flex-1 py-2 text-[10px] font-bold tracking-widest rounded transition-colors cursor-pointer ${i18n.language === 'gu' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}>ગુજરાતી</button>
             </div>
           </div>
 
@@ -145,32 +144,19 @@ export function SiteHeader() {
           <nav className="flex flex-col gap-6">
             <span className="text-[10px] tracking-[0.25em] text-muted-foreground uppercase font-bold">{t("Navigation")}</span>
             
-            <Link 
-              to="/" 
-              onClick={() => setMenuOpen(false)}
-              className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3"
-            >
+            <Link to="/" onClick={() => setMenuOpen(false)} className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3">
               <span className="opacity-50 text-sm">01</span> {t("HOME")}
             </Link>
             
-            <button 
-              onClick={() => scrollToSection('explore')}
-              className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3 text-left"
-            >
+            <button onClick={() => scrollToSection('explore')} className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3 text-left">
               <span className="opacity-50 text-sm">02</span> {t("PRODUCTS")}
             </button>
 
-            <button 
-              onClick={() => scrollToSection('location')}
-              className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3 text-left"
-            >
+            <button onClick={() => scrollToSection('location')} className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3 text-left">
               <span className="opacity-50 text-sm">03</span> {t("LOCATION")}
             </button>
 
-            <button 
-              onClick={() => scrollToSection('contact')}
-              className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3 text-left"
-            >
+            <button onClick={() => scrollToSection('contact')} className="text-lg font-black tracking-widest text-[#f3f6fb] hover:text-orange-500 transition-colors uppercase flex items-center gap-3 text-left">
               <span className="opacity-50 text-sm">04</span> {t("CONTACT US")}
             </button>
           </nav>
