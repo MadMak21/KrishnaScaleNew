@@ -67,7 +67,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAdminStore } from "@/store/adminStore";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -79,12 +79,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { loadSettings, isLoaded } = useAdminStore();
+  const [minLoadFinished, setMinLoadFinished] = useState(false);
 
   useEffect(() => {
     loadSettings();
+    // Enforce minimum 1.5s loading time to ensure the custom GIF shows at least 1 full rotation
+    const timer = setTimeout(() => setMinLoadFinished(true), 1500);
+    return () => clearTimeout(timer);
   }, [loadSettings]);
 
-  if (!isLoaded) {
+  if (!isLoaded || !minLoadFinished) {
     return (
       <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center">
         <img src="/loader.gif" alt="Loading..." className="w-48 h-48 object-contain mb-4" />
