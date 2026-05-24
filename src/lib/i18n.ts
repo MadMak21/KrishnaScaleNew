@@ -66,7 +66,13 @@ const resources = {
       "TABLE TOP SCALES": "TABLE TOP SCALES",
       "PLATFORM SCALES": "PLATFORM SCALES",
       "MINI BODY SCALES": "MINI BODY SCALES",
-      "CRANE SCALES": "CRANE SCALES"
+      "CRANE SCALES": "CRANE SCALES",
+      "Certified Solutions": "Certified Solutions",
+      "Verified accuracy & high quality engineering standards across all products.": "Verified accuracy & high quality engineering standards across all products.",
+      "Government Approved": "Government Approved",
+      "Fully licensed scale manufacturers with authorized stamping & calibration services.": "Fully licensed scale manufacturers with authorized stamping & calibration services.",
+      "Trusted Partner": "Trusted Partner",
+      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat."
     }
   },
   hi: {
@@ -133,7 +139,13 @@ const resources = {
       "TABLE TOP SCALES": "टेबल टॉप स्केल",
       "PLATFORM SCALES": "प्लेटफॉर्म स्केल",
       "MINI BODY SCALES": "मिनी बॉडी स्केल",
-      "CRANE SCALES": "क्रेन स्केल"
+      "CRANE SCALES": "क्रेन स्केल",
+      "Certified Solutions": "प्रमाणित समाधान",
+      "Verified accuracy & high quality engineering standards across all products.": "सभी उत्पादों में सत्यापित सटीकता और उच्च गुणवत्ता वाले इंजीनियरिंग मानक।",
+      "Government Approved": "सरकार द्वारा अनुमोदित",
+      "Fully licensed scale manufacturers with authorized stamping & calibration services.": "अधिकृत स्टैम्पिंग और अंशांकन सेवाओं के साथ पूरी तरह से लाइसेंस प्राप्त स्केल निर्माता।",
+      "Trusted Partner": "विश्वसनीय भागीदार",
+      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "पूरे गुजरात में 5000+ से अधिक संतुष्ट वाणिज्यिक और औद्योगिक सेटअप की सेवा।"
     }
   },
   gu: {
@@ -200,7 +212,13 @@ const resources = {
       "TABLE TOP SCALES": "ટેબલ ટોપ સ્કેલ્સ",
       "PLATFORM SCALES": "પ્લેટફોર્મ સ્કેલ્સ",
       "MINI BODY SCALES": "મીની બોડી સ્કેલ્સ",
-      "CRANE SCALES": "ક્રેન સ્કેલ્સ"
+      "CRANE SCALES": "ક્રેન સ્કેલ્સ",
+      "Certified Solutions": "પ્રમાણિત ઉકેલો",
+      "Verified accuracy & high quality engineering standards across all products.": "તમામ ઉત્પાદનોમાં ચકાસાયેલ ચોકસાઈ અને ઉચ્ચ ગુણવત્તાવાળા એન્જિનિયરિંગ ધોરણો.",
+      "Government Approved": "સરકાર દ્વારા માન્ય",
+      "Fully licensed scale manufacturers with authorized stamping & calibration services.": "અધિકૃત સ્ટેમ્પિંગ અને કેલિબ્રેશન સેવાઓ સાથે સંપૂર્ણ લાયસન્સ પ્રાપ્ત સ્કેલ ઉત્પાદકો.",
+      "Trusted Partner": "વિશ્વસનીય ભાગીદાર",
+      "Over 5000+ satisfied commercial and industrial setups serving all of Gujarat.": "સમગ્ર ગુજરાતમાં 5000+ થી વધુ સંતુષ્ટ વ્યાપારી અને ઔદ્યોગિક સેટઅપની સેવા."
     }
   }
 };
