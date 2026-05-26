@@ -53,8 +53,14 @@ function fileToBase64(file: File): Promise<string> {
         }
 
         ctx.drawImage(img, 0, 0, width, height);
-        // Export as JPEG with 0.8 quality for superb quality and minimal size
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+        
+        // Check if original file is PNG or WEBP to preserve transparency
+        const isTransparent = file.type === 'image/png' || file.type === 'image/webp' || file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.webp');
+        const exportType = isTransparent ? 'image/png' : 'image/jpeg';
+        const compressedBase64 = isTransparent 
+          ? canvas.toDataURL('image/png')
+          : canvas.toDataURL('image/jpeg', 0.8);
+          
         resolve(compressedBase64);
       };
       img.onerror = reject;
