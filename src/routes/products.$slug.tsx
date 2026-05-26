@@ -85,8 +85,8 @@ function ProductDetail() {
       {/* PRODUCT HERO / GALLERY */}
       <section className="pt-32 pb-16 px-6 md:px-10">
         <div className="max-w-7xl mx-auto">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold tracking-widest text-gray-400 hover:text-white mb-8 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <Link to="/" className="text-[10px] font-bold tracking-[0.2em] text-gray-400 hover:text-white uppercase flex items-center gap-2 mb-10 transition-colors w-max">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             {t("BACK TO PRODUCTS")}
           </Link>
 
@@ -159,27 +159,27 @@ function ProductDetail() {
                 <table className="w-full text-left text-sm md:text-base">
                   <tbody className="divide-y divide-white/10">
                     <tr className="hover:bg-white/5 transition-colors">
-                      <th className="px-6 py-4 font-bold text-gray-400 w-1/3">Capacity</th>
+                      <th className="px-6 py-4 font-bold text-gray-400 w-1/3">{t("Capacity")}</th>
                       <td className="px-6 py-4 text-white font-medium">{product.capacity}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
-                      <th className="px-6 py-4 font-bold text-gray-400">Accuracy</th>
+                      <th className="px-6 py-4 font-bold text-gray-400">{t("Accuracy")}</th>
                       <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.accuracy || "Standard Class III / Heavy Duty"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
-                      <th className="px-6 py-4 font-bold text-gray-400">Material</th>
+                      <th className="px-6 py-4 font-bold text-gray-400">{t("Material")}</th>
                       <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.material || "MS / SS (Industrial Grade)"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
-                      <th className="px-6 py-4 font-bold text-gray-400">Display Type</th>
+                      <th className="px-6 py-4 font-bold text-gray-400">{t("Display Type")}</th>
                       <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.displayType || "High Brightness Red/Green LED"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
-                      <th className="px-6 py-4 font-bold text-gray-400">Battery Backup</th>
+                      <th className="px-6 py-4 font-bold text-gray-400">{t("Battery Backup")}</th>
                       <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.batteryBackup || "Up to 48 Hours In-built"}</td>
                     </tr>
                     <tr className="hover:bg-white/5 transition-colors">
-                      <th className="px-6 py-4 font-bold text-gray-400">Warranty</th>
+                      <th className="px-6 py-4 font-bold text-gray-400">{t("Warranty")}</th>
                       <td className="px-6 py-4 text-white font-medium">{rawProduct.specs?.warranty || "1 Year Manufacturer Warranty"}</td>
                     </tr>
                   </tbody>
@@ -241,13 +241,13 @@ function ProductDetail() {
       {/* STICKY MOBILE CTA */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#020817] border-t border-white/10 p-4 z-50 flex gap-3 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
         <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="flex-1 pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center justify-center text-xs py-3">
-          WHATSAPP
+          {t("WHATSAPP INQUIRY")}
         </a>
         <button 
           onClick={() => openInquiry(rawProduct.slug)} 
           className="flex-1 pill-btn text-center border-white/20 hover:bg-white/10 text-white justify-center text-xs py-3 cursor-pointer"
         >
-          EMAIL
+          {t("MAIL INQUIRY")}
         </button>
       </div>
     </main>

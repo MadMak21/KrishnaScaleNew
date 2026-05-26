@@ -58,7 +58,7 @@ export function SiteFooter() {
       </div>
       
       <div className="max-w-7xl mx-auto px-6 md:px-10 mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs tracking-widest text-gray-500">
-        <span>© {new Date().getFullYear()} {t("KRISHNA SCALE")}. ALL RIGHTS RESERVED.</span>
+        <span>© {new Date().getFullYear()} {t("KRISHNA SCALE")}. {t("ALL RIGHTS RESERVED")}.</span>
         <div className="flex gap-6">
           <a href="#" className="hover:text-white transition-colors">{t("PRIVACY POLICY")}</a>
           <a href="#" className="hover:text-white transition-colors">{t("TERMS OF SERVICE")}</a>
