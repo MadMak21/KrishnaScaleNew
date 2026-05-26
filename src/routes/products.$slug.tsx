@@ -42,7 +42,7 @@ function ProductDetail() {
   const exploreConfig = settings?.exploreConfig?.[rawProduct.slug] || { relatedProducts: [], galleryImagesCount: 4 };
 
   const defaultRelated = allStoreProducts.filter(p => p.slug !== rawProduct.slug).slice(0, 4);
-  const relatedProducts = exploreConfig.relatedProducts && exploreConfig.relatedProducts.length > 0 
+  const relatedProducts = exploreConfig.relatedProducts
     ? exploreConfig.relatedProducts.map(slug => allStoreProducts.find(p => p.slug === slug)).filter(Boolean) as typeof allStoreProducts
     : defaultRelated;
   const [activeImgIdx, setActiveImgIdx] = useState(0);
@@ -55,7 +55,8 @@ function ProductDetail() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const baseImages = rawProduct.gallery && rawProduct.gallery.length > 0 ? rawProduct.gallery : [rawProduct.img];
+  // Prepend main product image as the first image in display images, followed by gallery images
+  const baseImages = [rawProduct.img, ...(rawProduct.gallery || [])].filter(Boolean);
   const displayImages = baseImages.slice(0, exploreConfig.galleryImagesCount || 4);
   const activeImage = displayImages[activeImgIdx] || displayImages[0];
 
@@ -189,7 +190,14 @@ function ProductDetail() {
           </div>
 
           <div className="mt-16 hidden md:flex gap-6 justify-start">
-            <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center">
+            <a 
+              href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=${encodeURIComponent(
+                `Hi Krishna Scale,\n\nI want to inquire about the following product:\n• Name: ${product.name}\n• Capacity: ${product.capacity}\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`
+              )}`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center"
+            >
               {t("WHATSAPP INQUIRY")}
             </a>
             <button 
@@ -240,7 +248,14 @@ function ProductDetail() {
       
       {/* STICKY MOBILE CTA */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#020817] border-t border-white/10 p-4 z-50 flex gap-3 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
-        <a href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=Hi, I want to inquire about ${product.name}.`} target="_blank" rel="noopener noreferrer" className="flex-1 pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center justify-center text-xs py-3">
+        <a 
+          href={`https://wa.me/${settings.contactInfo?.whatsappNumber || "919033621801"}?text=${encodeURIComponent(
+            `Hi Krishna Scale,\n\nI want to inquire about the following product:\n• Name: ${product.name}\n• Capacity: ${product.capacity}\n\nLink: ${typeof window !== 'undefined' ? window.location.href : ''}`
+          )}`} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="flex-1 pill-btn bg-green-600 hover:bg-green-500 text-white border-none text-center justify-center text-xs py-3"
+        >
           {t("WHATSAPP INQUIRY")}
         </a>
         <button 

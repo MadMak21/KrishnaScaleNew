@@ -32,8 +32,9 @@ export interface AdminStore {
   updateSettings: (newSettings: Partial<Settings>) => Promise<void>;
   loadSettings: () => Promise<void>;
   
-  inquiryModalOpen: boolean;
-  openInquiry: () => void;
+  isInquiryOpen: boolean;
+  inquiryProductSlug: string;
+  openInquiry: (slug?: string) => void;
   closeInquiry: () => void;
 
   updateContactInfo: (info: Partial<ContactInfo>) => Promise<void>;
@@ -74,10 +75,11 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   isAuthenticated: localStorage.getItem(AUTH_STORAGE_KEY) === 'true',
   isLoaded: false,
   settings: DEFAULT_SETTINGS,
-  inquiryModalOpen: false,
+  isInquiryOpen: false,
+  inquiryProductSlug: '',
 
-  openInquiry: () => set({ inquiryModalOpen: true }),
-  closeInquiry: () => set({ inquiryModalOpen: false }),
+  openInquiry: (slug = '') => set({ isInquiryOpen: true, inquiryProductSlug: slug }),
+  closeInquiry: () => set({ isInquiryOpen: false, inquiryProductSlug: '' }),
 
   login: () => {
     localStorage.setItem(AUTH_STORAGE_KEY, 'true');
