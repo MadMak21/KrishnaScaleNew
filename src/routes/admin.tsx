@@ -54,12 +54,9 @@ function fileToBase64(file: File): Promise<string> {
 
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Check if original file is PNG or WEBP to preserve transparency
-        const isTransparent = file.type === 'image/png' || file.type === 'image/webp' || file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.webp');
-        const exportType = isTransparent ? 'image/png' : 'image/jpeg';
-        const compressedBase64 = isTransparent 
-          ? canvas.toDataURL('image/png')
-          : canvas.toDataURL('image/jpeg', 0.8);
+        const exportType = 'image/webp';
+        // Use webp which supports both transparency and great compression
+        const compressedBase64 = canvas.toDataURL(exportType, 0.7);
           
         resolve(compressedBase64);
       };

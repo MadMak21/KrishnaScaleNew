@@ -22,6 +22,9 @@ export const Route = createFileRoute("/products/$slug")({
       meta: [
         { title: `${prod?.name || 'Product'} | Krishna Scale` },
         { name: "description", content: prod?.description },
+        { property: "og:title", content: prod?.name || 'Product' },
+        { property: "og:description", content: prod?.description },
+        { property: "og:image", content: loaderData?.product?.img || '' },
       ],
     };
   },

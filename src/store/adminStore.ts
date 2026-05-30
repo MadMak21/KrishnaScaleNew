@@ -128,9 +128,20 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         .from('settings')
         .upsert({ id: 'krishna-scale-admin', data: updated });
         
-      if (error) throw error;
+      if (error) {
+        if (error.code === '413' || error.message.includes('payload')) {
+          alert("Error: The image sizes are too large to save! Please upload smaller images.");
+        } else {
+          alert("Error saving settings: " + error.message);
+        }
+        // Revert optimistic update
+        set({ settings: current });
+        throw error;
+      }
     } catch (error) {
       console.error("Error saving settings to Supabase:", error);
+      // Revert if it wasn't caught by the if(error) block (e.g. network failure)
+      set({ settings: current });
     }
   },
 
